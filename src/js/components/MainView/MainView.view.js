@@ -153,7 +153,7 @@ export default Marionette.View.extend({
             };
             const statePieStart = new PieChart({
                 id: 'pieChartContainer',
-                "className": 'pie-chart pie-chart-sm',
+                "className": 'pie-chart',
                 district,
                 options: {
                     title: {
@@ -185,7 +185,7 @@ export default Marionette.View.extend({
             const summary = result['unofficial-summary'][0];
             const countryPieStart = new PieChart({
                 id: 'pieChartContainer',
-                "className": 'state-pie-chart',
+                "className": 'country-pie-chart',
                 district: {
                     confirmed: summary.total,
                     active: summary.active,
@@ -249,10 +249,33 @@ export default Marionette.View.extend({
         result = result.splice(0, 10);
         const data = {
             datasets: [{
-                label: "Confirmed Cases",
-                data: result.map(a => a.totalConfirmed),
-                backgroundColor: ['#20639B', '#ED553B', '#3CAEA3', '#20639B', '#ED553B', '#3CAEA3', '#20639B', '#ED553B', '#3CAEA3', '#20639B'],
-            }],
+                label: "Recovered",
+                data: result.map(a => a.discharged),
+                backgroundColor: 'rgba(60, 174, 163, 0.8)',
+                hoverBackgroundColor: 'rgba(60, 174, 163, 1)',
+                datalabels: {
+                    align: 'right',
+                    anchor: 'start'
+                }
+            },{
+                label: "Deaths",
+                data: result.map(a => a.deaths),
+                backgroundColor: 'rgba(237, 85, 59, 0.8)',
+                hoverBackgroundColor: 'rgba(237, 85, 59, 1)',
+                datalabels: {
+                    align: 'center',
+                    anchor: 'center'
+                }
+            },{
+                label: "Active",
+                data: result.map(a => a.totalConfirmed - a.discharged - a.deaths),
+                backgroundColor: 'rgba(32, 99, 155, 0.8)',
+                hoverBackgroundColor: 'rgba(32, 99, 155, 1)',
+                datalabels: {
+                    align: 'left',
+                    anchor: 'end'
+                }
+            },],
             labels: result.map(a => a.loc),
         };
         const countryBarChart = new BarChart({
@@ -261,7 +284,7 @@ export default Marionette.View.extend({
             data, options: {
                 title: {
                     display: true,
-                    text: 'Click to load state'
+                    text: 'Top 10 States (Click to load state)'
                 },
             }
         });
@@ -358,7 +381,7 @@ export default Marionette.View.extend({
             allDistricts = this.sortDistricts(allDistricts, criteria, orderDesc);
             allDistricts = allDistricts.splice(0, 10);
             allDistricts.forEach(dist => { result[dist.name] = dist });
-            return { districtData: result };
+            return { districtData: result, showStateName: true }
         }).then(this.prepareDistrictData.bind(this)).then(({ districts, stateZoneStats }) => {
             this.getChildView('topDistrictPieChartRegion').collection.reset(districts);
             this.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
@@ -400,8 +423,8 @@ export default Marionette.View.extend({
                     options: {
                         title: {
                             display: true,
-                            text: key + (district.state ? ' (' + district.state + ')' : ''),
-                            fontSize: district.state ? 13 : 17
+                            text: key + (result.showStateName ? ' (' + district.state + ')' : ''),
+                            fontSize: result.showStateName ? 13 : 17
                         },
                         legend: {
                             display: false
@@ -430,19 +453,22 @@ export default Marionette.View.extend({
             } else if (sortBy == 'Zone') {
                 if (b.zone && a.zone) {
                     flag = zones[b.zone.zone] - zones[a.zone.zone];
-                } else flag = 1;
+                } else flag = b.active - a.active;
             } else if (sortBy == 'Confirmed Gain') {
                 if (b.delta && a.delta) {
                     flag = b.delta.confirmed - a.delta.confirmed;
-                } else flag = 1;
+                }
+                if (!flag) flag = b.confirmed - a.confirmed;
             } else if (sortBy == 'Recovered Gain') {
                 if (b.delta && a.delta) {
                     flag = b.delta.recovered - a.delta.recovered;
-                } else flag = 1;
+                }
+                if (!flag) flag = b.recovered - a.recovered;
             } else if (sortBy == 'Deaths Gain') {
                 if (b.delta && a.delta) {
                     flag = b.delta.deceased - a.delta.deceased;
-                } else flag = 1;
+                }
+                if (!flag) flag = b.deceased - a.deceased;
             } else {
                 flag = b.confirmed - a.confirmed;
             }

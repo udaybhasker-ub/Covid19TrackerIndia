@@ -1,6 +1,8 @@
 import Marionette from 'backbone.marionette';
 import barChartTemplate from './BarChart.view.jst'
 import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.plugins.unregister(ChartDataLabels);
 
 export default Marionette.View.extend({
     template: barChartTemplate,
@@ -19,45 +21,43 @@ export default Marionette.View.extend({
         const data = { ...this.model.attributes };
         this.$el.addClass(data.className);
         const defaults = {
+            plugins: {
+                datalabels: {
+                    color: 'white',
+                    font: {
+                        size: 10,
+                    },
+                    formatter: Math.round
+                }
+            },
             scales: {
                 xAxes: [{
-                    ticks: {
+                    /*ticks: {
                         autoSkip: false,
                         maxRotation: 90,
                         minRotation: 90
-                    }
+                    }*/
+                    stacked: true
+                }],
+                yAxes: [{
+                    stacked: true
                 }]
             },
             legend: {
                 display: false
             },
             showTooltips: false,
-            "hover": {
-                "animationDuration": 0
-            },
-            "animation": {
-                "duration": 1,
-                "onComplete": function () {
-                    var chartInstance = this.chart,
-                        ctx = chartInstance.ctx;
-
-                    ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-
-                    this.data.datasets.forEach(function (dataset, i) {
-                        var meta = chartInstance.controller.getDatasetMeta(i);
-                        meta.data.forEach(function (bar, index) {
-                            var data = dataset.data[index];
-                            ctx.fillText(data, bar._model.x, bar._model.y - 5);
-                        });
-                    });
-                }
-            },
         };
+        const isMobile = $(document).width() < 800;
         const $canvas = this.$el.find('#' + data.id + "_barchart_canvas");
+        let type;
+        if (isMobile) {
+            type = 'bar';
+            data.options.aspectRatio = 1;
+        } else type = 'horizontalBar';
+
         const chart = new Chart($canvas, {
-            type: 'horizontalBar', data: data.data, options: { ...defaults, ...data.options }
+            type, data: data.data, options: { ...defaults, ...data.options }, plugins: [ChartDataLabels]
         });
 
         $canvas.on('click', (evt) => {

@@ -5,12 +5,14 @@
     </div>
   </div>
   <div class="border-top"></div>
-  <div class="row">
-    <div class="col">
-      <div id="countryPieChartContainer"></div>
-    </div>
-    <div class="col">
-      <div id="countryLineChartContainer"></div>
+  <div class="container country-chart-container">
+    <div class="row">
+      <div class="col-md-4 align-self-center">
+        <div id="countryPieChartContainer"></div>
+      </div>
+      <div class="col-md-8 align-self-center">
+        <div id="countryLineChartContainer"></div>
+      </div>
     </div>
   </div>
   <div id="selectionNavBar" class="row">
@@ -28,8 +30,8 @@
     </div>
   </div>
   <div id="topDistrictContainer" class="row">
-    <div id="topDistrictSortByDropdown" class="">
-      <button id="topDistrictDropdownMenuButton" class="btn btn-light dropdown-toggle" type="button"
+    <div id="topDistrictSortByDropdown" class="mx-auto my-3">
+      <button id="topDistrictDropdownMenuButton" class="btn btn-secondary dropdown-toggle" type="button"
         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Criteria:
       </button>
       <div class="dropdown-menu">
@@ -47,7 +49,7 @@
   </div>
   <div id="stateContentMain" class="">
     <div id="stateStatusBanner" class="row">
-      <div id="statePieChartContainer" class="col-md-2 d-none d-lg-block"></div>
+      <div id="statePieChartContainer" class="col-md-2"></div>
       <div id="stateLineChartContainer" class="col-md-2 d-none d-lg-block"></div>
       <div id="statePieChartName" class="col-md-2"></div>
       <div id="stateStatusBadgesContainer" class="col-md-6"></div>
@@ -58,14 +60,14 @@
           <div class="col-sm-2">
             <div class="distric-header-text">Districts</div>
           </div>
-          <div class="col-sm-2 district-badge-items">
+          <div class="col-sm-7 district-badge-items">
             <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>
             <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>
             <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>
           </div>
-          <div class="col-sm-8 sortby-dropdown">
+          <div class="col-sm-3 sortby-dropdown">
             <div id="sortByDropdown" class="dropdown sort-by-dropdown">
-              <button class="btn btn-light dropdown-toggle" type="button" id="sortBydropdownMenuButton"
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="sortBydropdownMenuButton"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Sort By
               </button>
@@ -79,13 +81,14 @@
                 <a class="dropdown-item" href="#">Recovered Gain</a>
                 <a class="dropdown-item" href="#">Deaths Gain</a>
               </div>
-              <a id="sortOrderBtn" href="#" class="btn btn-light sort-order-btn" role="button" aria-pressed="true">
+              <a id="sortOrderBtn" href="#" class="btn btn-secondary sort-order-btn" role="button" aria-pressed="true">
                 <i class="material-icons">sort</i>
                 <i class="material-icons arrow">arrow_downward</i>
               </a>
             </div>
           </div>
         </div>
+        <div class="border-bottom"></div>
         <div id="districtChartsContainer"></div>
       </div>
     </div>

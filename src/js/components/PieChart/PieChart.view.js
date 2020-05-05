@@ -1,6 +1,7 @@
 import Marionette from 'backbone.marionette';
 import pieChartTemplate from './PieChart.view.jst'
 import Chart from 'chart.js';
+import 'chartjs-plugin-labels';
 import BadgeBarView from '../BadgeBar/BadgeBar.view';
 
 export default Marionette.View.extend({
@@ -22,7 +23,9 @@ export default Marionette.View.extend({
     onRender: function () {
         this.loadPieChart();
         const district = this.model.get('district');
-        if(!this.model.get('options').hideBadgeBar) this.showChildView('badgesBarContainerRegion', new BadgeBarView({ district }));
+        if (!this.model.get('options').hideBadgeBar) {
+            this.$el.find('.badge-bar-container').html(new BadgeBarView({ district }).render().el);
+        }
 
         if (district && district.zone) {
             const $zoneIndecator = this.$el.find('.chart-zone-indicator');
@@ -54,9 +57,17 @@ export default Marionette.View.extend({
                 'Active',
                 'Deceased',
                 'Recovered'
-            ],
+            ]
         };
         var defaults = {
+            plugins: {
+                labels: {
+                    render: 'percentage',
+                    fontColor: 'white',
+                    fontSize: 10,
+                    precision: 0
+                }
+            },
             tooltips: {
                 callbacks: {
                     label: function (tooltipItem, data) {

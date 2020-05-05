@@ -3,21 +3,24 @@
 }
 .state-line-chart{
     width: 150px;
-    float: left;
     margin-right: 20px;
 }
 .state-bar-chart{
-    width: 700px;
-    float: left;
+    //width: 700px;
     margin-right: 20px;
 }
+
 #barChartContainer{
     margin: 35px 0px;
 }
 
-@media only screen and (min-width: 600px) {
-    .pie-chart-md {
-        width: 360px;
+#statePieChartContainer{
+    .pie-chart {
+        min-width: 350px;
+        max-width: 350px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
     }
 }
 .pie-chart {
@@ -40,71 +43,116 @@
 .distric-header-text{
     font-size: 20pt;
     font-weight: bold;
+    color: gray;
 }
 .state-wide-graphs-row {
     margin: 30px 0px;
 }
 
+.pie-chart-collection{
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .district-pie-chart {
-    width: 210px;
+    min-width: 210px;
     float: left;
     margin: 7px;
 
     padding-bottom: 15px;
     background-color:#f7f7f7;
     border: solid 1px gray;
+
+    .pie-chart-canvas-container {
+        max-width: 210px;
+    }
+    .badge-bar-container {
+        min-width: 210px;
+    }
 }
 
-.chart-legend {
+.country-pie-chart {
+    & .badge.status-badge {
+        width: 100px;
+        margin: 5px;
+    }
+}
+
+@media only screen and (min-width: 450px) {
+    .district-pie-chart {
+        width: 210px;
+    }
+    .country-pie-chart {
+        min-width: 50vw;
+    }
+}
+@media only screen and (max-width: 450px) {
+    .district-pie-chart {
+        & .badge.status-badge {
+            width: 60px !important;
+            margin: 3px 3px;
+        }
+        .pie-chart-canvas-container {
+            width: 90px;
+        }
+    }
+}
+
+.badge-bar-container {
     text-align: center;
     margin-top: 10px;
 }
 
-.badge.status-badge {
-    width: 90px;
-    margin: 3px 3px;
-}
-.badge-status-text {
-    font-size: 7pt;
-    color: lightgray;
-}
-.badge-status-count{
-    display: block;
-    font-size: 14pt;
-    margin: 2px 0px;
-}
-
-.badge-status-count > i{
-    font-size: 9pt;
-    font-weight: bold;
-    margin-right: -5px;
-    margin-left: 2px;
-}
-
-.badge-status-delta {
-    i {
-        display: inline-block;
-        font-size: 12px;
+.badge-bar-content {
+    justify-content: center;
+    
+    .badge.status-badge {
+        width: 80px;
+        margin: 4px;
+    }
+    .badge-status-text {
+        font-size: 7pt;
+        color: lightgray;
+    }
+    .badge-status-count{
+        display: block;
+        font-size: 14pt;
+        margin: 2px 0px;
+    }
+    
+    .badge-status-count > i{
+        font-size: 9pt;
         font-weight: bold;
+        margin-right: -5px;
+        margin-left: 2px;
     }
-    .badge-status-delta-text {
-        display: inline-block;
-        position: relative;
-        top: -2px;
-        left: -3px;
-        font-size: 14px;
+    
+    .badge-status-delta {
+        i {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-status-delta-text {
+            display: inline-block;
+            position: relative;
+            top: -2px;
+            left: -3px;
+            font-size: 14px;
+        }
+    }
+    
+    .badge.active {
+        background-color: #20639B;
+    }
+    .badge.deceased {
+        background-color: #ED553B;
+    }
+    .badge.recovered {
+        background-color: #3CAEA3;
     }
 }
 
-.badge.active {
-    background-color: #20639B;
-}
-.badge.deceased {
-    background-color: #ED553B;
-}
-.badge.recovered {
-    background-color: #3CAEA3;
-}
 .chart-zone-indicator {
     height: 14px;
     font-size: 6pt;
@@ -131,18 +179,23 @@ div#statePieChartContainer .badge-status-delta {
 .sort-order-btn{
     padding: 2px 15px;
     margin: 2px;
+    height: 30px;
+    font-size: 12px;
 
     i{
         font-size: 10pt;
         font-weight: bold;
+        position: relative;
+        display: inline-block;
+        top: -3px;
 
         &.arrow{
-            margin: 0px -6px;
+            margin-left: -5px;
         }
     }
 }
 .sort-by-dropdown{
-    float: right;
+    top: 4px;
 
     & button {
         height: 30px;
@@ -219,8 +272,7 @@ a#dropdownMenuButton {
     }
 }
 #districtsHeader {
-    margin: 15px 20px;
-    border-bottom: 1px solid lightgray;
+    margin: 7px 20px;
 }
 .col-centered{
     display: block;
@@ -236,6 +288,7 @@ a#dropdownMenuButton {
   #pageTitle {
     margin: 20px 0px;
     color: #797777;
+    font-size: 20px;
   }
 
   #topDistrictChartsContainer.row{

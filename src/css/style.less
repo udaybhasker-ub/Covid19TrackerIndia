@@ -1,0 +1,244 @@
+#titleBar{
+    text-align: center;
+}
+.state-line-chart{
+    width: 150px;
+    float: left;
+    margin-right: 20px;
+}
+.state-bar-chart{
+    width: 700px;
+    float: left;
+    margin-right: 20px;
+}
+#barChartContainer{
+    margin: 35px 0px;
+}
+
+@media only screen and (min-width: 600px) {
+    .pie-chart-md {
+        width: 360px;
+    }
+}
+.pie-chart {
+    //float: none;
+    &.bordered {
+        margin: 30px auto;
+        padding-bottom: 15px;
+        border: solid 1px gray;
+    }
+}
+.pie-chart-sm {
+    width:180px;
+}
+.pie-chart-md {
+    width:360px;
+}
+.pie-chart-lg {
+    width:540px;
+}
+.distric-header-text{
+    font-size: 20pt;
+    font-weight: bold;
+}
+.state-wide-graphs-row {
+    margin: 30px 0px;
+}
+
+.district-pie-chart {
+    width: 210px;
+    float: left;
+    margin: 7px;
+
+    padding-bottom: 15px;
+    background-color:#f7f7f7;
+    border: solid 1px gray;
+}
+
+.chart-legend {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.badge.status-badge {
+    width: 90px;
+    margin: 3px 3px;
+}
+.badge-status-text {
+    font-size: 7pt;
+    color: lightgray;
+}
+.badge-status-count{
+    display: block;
+    font-size: 14pt;
+    margin: 2px 0px;
+}
+
+.badge-status-count > i{
+    font-size: 9pt;
+    font-weight: bold;
+    margin-right: -5px;
+    margin-left: 2px;
+}
+
+.badge-status-delta {
+    i {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .badge-status-delta-text {
+        display: inline-block;
+        position: relative;
+        top: -2px;
+        left: -3px;
+        font-size: 14px;
+    }
+}
+
+.badge.active {
+    background-color: #20639B;
+}
+.badge.deceased {
+    background-color: #ED553B;
+}
+.badge.recovered {
+    background-color: #3CAEA3;
+}
+.chart-zone-indicator {
+    height: 14px;
+    font-size: 6pt;
+    font-weight: bold;
+    text-align: right;
+    padding: 0px 5px;
+    color: white;
+    opacity: 0.8;
+}
+.district-badge-items{
+    margin: 8px 0px;
+}
+.district-badge-items > .badge{
+    margin: 0 3px;
+    min-width: 30px;
+    font-size: 13px;
+}
+
+div#statePieChartContainer .badge-status-delta {
+    font-size: 8pt;
+    margin: 3px 0px;
+}
+
+.sort-order-btn{
+    padding: 2px 15px;
+    margin: 2px;
+
+    i{
+        font-size: 10pt;
+        font-weight: bold;
+
+        &.arrow{
+            margin: 0px -6px;
+        }
+    }
+}
+.sort-by-dropdown{
+    float: right;
+
+    & button {
+        height: 30px;
+        font-size: 12px;
+    }
+}
+#districtContainer{
+    width: 100%;
+}
+#footerCreditsText {
+    float: right;
+    font-size: 14px;
+    color: darkgray;
+}
+#footerDevText {
+    color: darkgrey;
+    font-size: 11px;
+}
+a#dropdownMenuButton {
+    font-weight: bold;
+}
+
+#stateStatusBadgesContainer {
+    .status-badge {
+        min-width: 110px;
+        min-height: 80px;
+        margin: 7px;
+    }
+    .badge-status-text {
+        font-size: 9pt;
+        padding: 3px 0px;
+        display: block;
+    }
+    .badge-status-count {
+        font-size: 15pt;
+        color: white;
+        margin: 5px 0px;
+    }
+    .badge-status-delta-arrow {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 0px auto;
+    }
+    .badge-status-delta {
+        i {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-status-delta-text {
+            display: inline-block;
+            position: relative;
+            top: -2px;
+            left: -3px;
+            font-size: 14px;
+        }
+    }
+}
+
+#stateStatusBanner{
+    margin: 35px 0px;
+    text-align: center;
+    border: 1px solid lightgray;
+    border-radius: 20px;
+
+    & > div {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+    & > #statePieChartName{
+        font-size: 27px;
+        font-weight: bold;
+        text-align: center;
+    }
+}
+#districtsHeader {
+    margin: 15px 20px;
+    border-bottom: 1px solid lightgray;
+}
+.col-centered{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  #selectionNavBar {
+    margin: 30px 0px;
+  }
+
+  #pageTitle {
+    margin: 20px 0px;
+    color: #797777;
+  }
+
+  #topDistrictChartsContainer.row{
+      margin-left: 0px;
+      margin-right: 0px
+  }

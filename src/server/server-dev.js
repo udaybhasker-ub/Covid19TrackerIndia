@@ -28,7 +28,7 @@ app.get('/covid', (req, res, next) => {
 
 const request = (path, options, callback) => {
     app.get(path, (req, resp, next) => {
-        console.log('Request:' + path);
+        console.log(new Date() + ' - Request:' + req.url + ' from '+req.connection.remoteAddress);
         https.get(options, (res) => {
             var json = '';
 

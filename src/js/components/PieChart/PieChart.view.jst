@@ -1,4 +1,5 @@
 <div class="chart-zone-indicator"></div>
+ <div class="pie-chart-title" style="<%=(!options.title.display && options.title.customTitle) ? '' : 'display:none'%>"><%=options.title.text%></div>
 <div class="pie-chart-inner-container">
     <div class="pie-chart-canvas-container col-md-6">
         <canvas id="<%=id%>_canvas"></canvas>

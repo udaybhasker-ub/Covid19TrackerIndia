@@ -10,13 +10,18 @@
     margin-right: 20px;
 }
 
+.zones-header-text {
+    display: inline-block;
+    color: gray;
+}
+
 #barChartContainer{
     margin: 35px 0px;
 }
 
 #statePieChartContainer{
     .pie-chart {
-        min-width: 350px;
+        min-width: 300px;
         max-width: 350px;
         margin-left: auto;
         margin-right: auto;
@@ -31,6 +36,17 @@
         border: solid 1px gray;
     }
 }
+
+.pie-chart-title {
+    text-align: center;
+    font-size: 16px;
+    margin: 5px;
+    color: darkslategrey;
+    height: 25px;
+    overflow: hidden;
+}
+
+
 .pie-chart-sm {
     width:180px;
 }
@@ -93,7 +109,8 @@
             margin: 3px 3px;
         }
         .pie-chart-canvas-container {
-            width: 90px;
+            //width: 90px;
+            display: none;
         }
     }
 }

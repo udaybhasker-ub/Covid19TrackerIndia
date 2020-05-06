@@ -1,7 +1,7 @@
 import Marionette from 'backbone.marionette';
 import pieChartTemplate from './PieChart.view.jst'
 import Chart from 'chart.js';
-import 'chartjs-plugin-labels';
+import ChartLabels from 'chartjs-plugin-labels';
 import BadgeBarView from '../BadgeBar/BadgeBar.view';
 
 export default Marionette.View.extend({
@@ -64,7 +64,7 @@ export default Marionette.View.extend({
                 labels: {
                     render: 'percentage',
                     fontColor: 'white',
-                    fontSize: 10,
+                    fontSize: 9,
                     precision: 0
                 }
             },
@@ -90,7 +90,7 @@ export default Marionette.View.extend({
         return new Chart(this.$el.find('#' + data.id + "_canvas"), {
             type: 'pie',
             data: chartData,
-            options: { ...defaults, ...data.options }
+            options: { ...defaults, ...data.options },
         });
     }
 });

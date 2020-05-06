@@ -36,13 +36,13 @@
       </button>
       <div class="dropdown-menu">
         <a class="dropdown-item" href="#">Confirmed</a>
+        <a class="dropdown-item" href="#">Confirmed - Daily Increase</a>
         <a class="dropdown-item" href="#">Active</a>
         <a class="dropdown-item" href="#">Recovered</a>
+        <a class="dropdown-item" href="#">Recovered - Daily Increase</a>
         <a class="dropdown-item" href="#">Deaths</a>
+        <a class="dropdown-item" href="#">Deaths - Daily Increase</a>
         <a class="dropdown-item" href="#">Zone</a>
-        <a class="dropdown-item" href="#">Confirmed Gain</a>
-        <a class="dropdown-item" href="#">Recovered Gain</a>
-        <a class="dropdown-item" href="#">Deaths Gain</a>
       </div>
     </div>
     <div id="topDistrictChartsContainer" class="row"></div>
@@ -57,15 +57,16 @@
     <div class="row district-wide-graphs-row">
       <div id="districtContainer">
         <div id="districtsHeader" class="row">
-          <div class="col-sm-2">
+          <div class="col-sm-2"> 
             <div class="distric-header-text">Districts</div>
           </div>
-          <div class="col-sm-7 district-badge-items">
+          <div class="col-sm-6 district-badge-items">
+            <div class="zones-header-text">Zones</div>
             <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>
             <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>
             <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>
           </div>
-          <div class="col-sm-3 sortby-dropdown">
+          <div class="col-sm-4 sortby-dropdown">
             <div id="sortByDropdown" class="dropdown sort-by-dropdown">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="sortBydropdownMenuButton"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -73,13 +74,13 @@
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" href="#">Confirmed</a>
+                <a class="dropdown-item" href="#">Confirmed - Daily Increase</a>
                 <a class="dropdown-item" href="#">Active</a>
                 <a class="dropdown-item" href="#">Recovered</a>
+                <a class="dropdown-item" href="#">Recovered - Daily Increase</a>
                 <a class="dropdown-item" href="#">Deaths</a>
+                <a class="dropdown-item" href="#">Deaths - Daily Increase</a>
                 <a class="dropdown-item" href="#">Zone</a>
-                <a class="dropdown-item" href="#">Confirmed Gain</a>
-                <a class="dropdown-item" href="#">Recovered Gain</a>
-                <a class="dropdown-item" href="#">Deaths Gain</a>
               </div>
               <a id="sortOrderBtn" href="#" class="btn btn-secondary sort-order-btn" role="button" aria-pressed="true">
                 <i class="material-icons">sort</i>

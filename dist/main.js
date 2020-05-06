@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "feb384d5a1baaa4fb08d";
+/******/ 	var hotCurrentHash = "26c98ef180c21d4bcc86";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -67542,8 +67542,8 @@ __webpack_require__.r(__webpack_exports__);
 jQuery(document).ready(function () {
   var app = new _js_App__WEBPACK_IMPORTED_MODULE_1__["default"]();
   app.start();
-});
-console.log("index.js started"); // Needed for Hot Module Replacement
+}); //console.log("index.js started");
+// Needed for Hot Module Replacement
 
 if (typeof module.hot !== 'undefined') {
   module.hot.accept(); // eslint-disable-line no-undef  
@@ -67880,7 +67880,8 @@ chart_js__WEBPACK_IMPORTED_MODULE_2___default.a.plugins.unregister(chartjs_plugi
             size: 10
           },
           formatter: Math.round
-        }
+        },
+        labels: false
       },
       scales: {
         xAxes: [{
@@ -67907,6 +67908,7 @@ chart_js__WEBPACK_IMPORTED_MODULE_2___default.a.plugins.unregister(chartjs_plugi
     if (isMobile) {
       type = 'bar';
       data.options.aspectRatio = 1;
+      defaults.plugins.datalabels = false;
     } else type = 'horizontalBar';
 
     var chart = new chart_js__WEBPACK_IMPORTED_MODULE_2___default.a($canvas, {
@@ -68129,7 +68131,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   initialize: function initialize() {
     this.defaultSelections = {
       stateSelected: "Telangana",
-      sortBySelected: "Confirmed Gain",
+      sortBySelected: "Confirmed - Daily Increase",
       sortByOrderDescending: false
     };
     this.stateSelected = this.defaultSelections.stateSelected;
@@ -68141,12 +68143,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       loc: this.stateSelected,
       totalConfirmed: ''
     };
+    this.districtHistory = {};
     this.model = new Backbone.Model(_objectSpread({}, defaults));
     Backbone.Radio.channel('user').on('changeState', this.changeStateSelection.bind(this));
   },
   onRender: function onRender() {
-    var _this = this;
-
     var $ddMenu = this.$el.find('#stateSelectionDropdown > .dropdown-menu');
     Object.keys(_data_States_json__WEBPACK_IMPORTED_MODULE_9__).forEach(function (state) {
       $ddMenu.append($('<a/>', {
@@ -68186,14 +68187,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           }
         };
         stateInsights[key] = insight;
-      });
-      console.dir(stateInsights);
-    });
-    this.showCountryPieChart().then(function (result) {
-      _this.showCountryBarChart(result);
-    }); //this.showCountryLineChart();
-
-    this.loadChildViews();
+      }); //console.dir(stateInsights);
+    }).then(this.loadChildViews.bind(this)).then(this.showCountryPieChart.bind(this)).then(this.showCountryBarChart.bind(this));
   },
   events: {
     'click #stateSelectionDropdown a.dropdown-item': 'onStateSelectionChange',
@@ -68241,7 +68236,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.getChildView('stateLineChartRegion').destroy();
   },
   loadChildViews: function loadChildViews() {
-    var _this2 = this;
+    var _this = this;
 
     this.$el.find('#stateContentMain').show();
     this.$el.find('#topDistrictContainer').hide();
@@ -68287,41 +68282,53 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         options: {
           title: {
             display: false,
-            text: _this2.stateSelected,
+            customTitle: false,
+            text: _this.stateSelected,
             fontSize: 20
           },
           legend: {
             display: false
           },
-          onClick: function onClick(e) {
-            console.log(e);
-          },
           hideBadgeBar: true
         }
       });
 
-      _this2.$el.find('#statePieChartName').html(_this2.stateSelected);
+      _this.$el.find('#statePieChartName').html(_this.stateSelected);
 
-      _this2.showChildView('stateStatusBadgesRegion', new _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_12__["default"]({
+      _this.showChildView('stateStatusBadgesRegion', new _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_12__["default"]({
         district: district
       }));
 
-      _this2.showChildView('statePieChartRegion', statePieStart);
+      _this.showChildView('statePieChartRegion', statePieStart);
     });
-    var historyModel = new _Models_StateData_model__WEBPACK_IMPORTED_MODULE_2__["default"]({
-      type: 'history',
-      stateName: this.stateSelected
-    });
-    historyModel.fetch().then(this.drawStateLineChart.bind(this));
+    var loaded = {};
+    var distHistory = this.districtHistory[this.stateSelected];
+
+    if (distHistory && !this.checkExpired(distHistory.lastUpdated, 24 * 60 * 60 * 1000)) {
+      loaded = Promise.resolve(distHistory.result);
+    } else {
+      loaded = new _Models_StateData_model__WEBPACK_IMPORTED_MODULE_2__["default"]({
+        type: 'history',
+        stateName: this.stateSelected
+      }).fetch();
+    }
+
+    loaded.then(function (result) {
+      _this.districtHistory[_this.stateSelected] = {
+        result: result,
+        lastUpdated: new Date()
+      };
+      return result;
+    }).then(this.drawStateLineChart.bind(this));
   },
   showCountryPieChart: function showCountryPieChart() {
-    var _this3 = this;
+    var _this2 = this;
 
     var latestCountry = new _Models_CountryData_model__WEBPACK_IMPORTED_MODULE_10__["default"]({
       type: 'latest'
     });
     return latestCountry.fetch().then(function (result) {
-      console.log(result);
+      //console.log(result);
       var summary = result['unofficial-summary'][0];
       var countryPieStart = new _PieChart_PieChart_view__WEBPACK_IMPORTED_MODULE_4__["default"]({
         id: 'pieChartContainer',
@@ -68335,6 +68342,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         options: {
           title: {
             display: true,
+            customTitle: false,
             text: 'India',
             fontSize: 20
           },
@@ -68344,13 +68352,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
       });
 
-      _this3.showChildView('countryPieChartRegion', countryPieStart);
+      _this2.showChildView('countryPieChartRegion', countryPieStart);
 
       return result;
     });
   },
   showCountryLineChart: function showCountryLineChart() {
-    var _this4 = this;
+    var _this3 = this;
 
     var statesDaily = new _Models_StatesDaily_model__WEBPACK_IMPORTED_MODULE_11__["default"]();
     statesDaily.fetch().then(function (result) {
@@ -68359,8 +68367,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return a.status == 'Confirmed';
       }).map(function (d) {
         return d.date;
-      });
-      console.log(result);
+      }); //console.log(result);
+
       var datasets = [];
       Object.keys(_data_States_json__WEBPACK_IMPORTED_MODULE_9__).forEach(function (state) {
         datasets.push({
@@ -68394,12 +68402,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         yAxesUpperLimit: 10000
       });
 
-      _this4.showChildView('countryLineChartRegion', countryLineChart);
+      _this3.showChildView('countryLineChartRegion', countryLineChart);
     });
   },
   showCountryBarChart: function showCountryBarChart(result) {
-    result = result.regional;
-    console.log(result);
+    result = result.regional; //console.log(result);
+
     result.sort(function (a, b) {
       return b.totalConfirmed - a.totalConfirmed;
     });
@@ -68501,17 +68509,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     });
     this.showChildView('stateLineChartRegion', stateLineChart);
   },
-  checkExpired: function checkExpired(date) {
-    var EXPIRE_DURATION = 5 * 60 * 1000;
-    date = new Date(date.getTime() + EXPIRE_DURATION);
+  checkExpired: function checkExpired(date, expireMillis) {
+    date = new Date(date.getTime() + expireMillis);
     return date.getTime() < new Date().getTime();
   },
   getAllDistrictsData: function getAllDistrictsData() {
-    var _this5 = this;
+    var _this4 = this;
 
     var loaded;
 
-    if (this.allDistrictData && this.allDistrictData.result && !this.checkExpired(this.allDistrictData.lastUpdated)) {
+    if (this.allDistrictData && this.allDistrictData.result && !this.checkExpired(this.allDistrictData.lastUpdated, 5 * 60 * 1000)) {
       loaded = Promise.resolve(this.allDistrictData.result);
     } else {
       var opts = {
@@ -68534,11 +68541,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               if (zone.zone) countryZoneStats[zone.zone]++;
             });
           });
-          _this5.allDistrictData = {
+          _this4.allDistrictData = {
             lastUpdated: new Date(),
             result: districtStatsResults
           };
-          return _this5.allDistrictData.result;
+          return _this4.allDistrictData.result;
         });
       });
     }
@@ -68546,7 +68553,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     return loaded;
   },
   getTopDistricts: function getTopDistricts(criteria, orderDesc) {
-    var _this6 = this;
+    var _this5 = this;
 
     this.$el.find('#stateContentMain').hide();
     this.$el.find('#topDistrictContainer').show();
@@ -68566,7 +68573,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           allDistricts.push(d);
         });
       });
-      allDistricts = _this6.sortDistricts(allDistricts, criteria, orderDesc);
+      allDistricts = _this5.sortDistricts(allDistricts, criteria, orderDesc);
       allDistricts = allDistricts.splice(0, 10);
       allDistricts.forEach(function (dist) {
         result[dist.name] = dist;
@@ -68579,15 +68586,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var districts = _ref.districts,
           stateZoneStats = _ref.stateZoneStats;
 
-      _this6.getChildView('topDistrictPieChartRegion').collection.reset(districts);
+      _this5.getChildView('topDistrictPieChartRegion').collection.reset(districts);
 
-      _this6.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
+      _this5.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
 
       return districts;
     });
   },
   getStateDistricts: function getStateDistricts() {
-    var _this7 = this;
+    var _this6 = this;
 
     var stateName = this.stateSelected;
     return this.getAllDistrictsData().then(function (allDistrictData) {
@@ -68596,29 +68603,29 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var districts = _ref2.districts,
           stateZoneStats = _ref2.stateZoneStats;
 
-      _this7.getChildView('districtPieChartRegion').collection.reset(districts);
+      _this6.getChildView('districtPieChartRegion').collection.reset(districts);
 
       Object.keys(stateZoneStats).forEach(function (key) {
-        var $badge = _this7.$el.find('.zone-badge-' + key);
+        var $badge = _this6.$el.find('.zone-badge-' + key);
 
         $badge.html(stateZoneStats[key]);
       });
 
-      _this7.$el.find('#sortByDropdown > button').html('Sort by: ' + _this7.sortBySelected);
+      _this6.$el.find('#sortByDropdown > button').html('Sort by: ' + _this6.sortBySelected);
 
-      _this7.$el.find('#sortOrderBtn > i.arrow').html("arrow_" + (_this7.sortByOrderDescending ? 'upward' : 'downward'));
+      _this6.$el.find('#sortOrderBtn > i.arrow').html("arrow_" + (_this6.sortByOrderDescending ? 'upward' : 'downward'));
 
       return districts;
     });
   },
   prepareDistrictData: function prepareDistrictData(result) {
-    var _this8 = this;
+    var _this7 = this;
 
     var stateName = this.stateSelected,
         sortBy = this.sortBySelected,
         sortByOrderDescending = this.sortByOrderDescending;
     return new Promise(function (resolve, rej) {
-      console.log(result);
+      //console.log(result);
       var districts = [],
           stateZoneStats = {
         Red: 0,
@@ -68635,7 +68642,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           district: district,
           options: {
             title: {
-              display: true,
+              display: false,
+              customTitle: true,
               text: key + (result.showStateName ? ' (' + district.state + ')' : ''),
               fontSize: result.showStateName ? 13 : 17
             },
@@ -68646,7 +68654,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         });
         if (district.zone) stateZoneStats[district.zone.zone]++;
       });
-      districts = _this8.sortDistricts(districts, sortBy, sortByOrderDescending);
+      districts = _this7.sortDistricts(districts, sortBy, sortByOrderDescending);
       resolve({
         districts: districts,
         stateZoneStats: stateZoneStats
@@ -68676,19 +68684,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         if (b.zone && a.zone) {
           flag = zones[b.zone.zone] - zones[a.zone.zone];
         } else flag = b.active - a.active;
-      } else if (sortBy == 'Confirmed Gain') {
+      } else if (sortBy == 'Confirmed - Daily Increase') {
         if (b.delta && a.delta) {
           flag = b.delta.confirmed - a.delta.confirmed;
         }
 
         if (!flag) flag = b.confirmed - a.confirmed;
-      } else if (sortBy == 'Recovered Gain') {
+      } else if (sortBy == 'Recovered - Daily Increase') {
         if (b.delta && a.delta) {
           flag = b.delta.recovered - a.delta.recovered;
         }
 
         if (!flag) flag = b.recovered - a.recovered;
-      } else if (sortBy == 'Deaths Gain') {
+      } else if (sortBy == 'Deaths - Daily Increase') {
         if (b.delta && a.delta) {
           flag = b.delta.deceased - a.delta.deceased;
         }
@@ -68719,7 +68727,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="container">\n  <div class="row">\n    <div id="titleBar" class="col">\n      <div id="pageTitle">India COVID-19 Tracker</div>\n    </div>\n  </div>\n  <div class="border-top"></div>\n  <div class="container country-chart-container">\n    <div class="row">\n      <div class="col-md-4 align-self-center">\n        <div id="countryPieChartContainer"></div>\n      </div>\n      <div class="col-md-8 align-self-center">\n        <div id="countryLineChartContainer"></div>\n      </div>\n    </div>\n  </div>\n  <div id="selectionNavBar" class="row">\n    <div class="col">\n      <ul class="nav nav-tabs">\n        <li class="nav-item">\n          <a id="topDistrictsBtn" class="nav-link" href="#">Top 10 Districts</a>\n        </li>\n        <li id="stateSelectionDropdown" class="nav-item dropdown">\n          <a id="dropdownMenuButton" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"\n            aria-haspopup="true" aria-expanded="false">Select State</a>\n          <div class="dropdown-menu"></div>\n        </li>\n      </ul>\n    </div>\n  </div>\n  <div id="topDistrictContainer" class="row">\n    <div id="topDistrictSortByDropdown" class="mx-auto my-3">\n      <button id="topDistrictDropdownMenuButton" class="btn btn-secondary dropdown-toggle" type="button"\n        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Criteria:\n      </button>\n      <div class="dropdown-menu">\n        <a class="dropdown-item" href="#">Confirmed</a>\n        <a class="dropdown-item" href="#">Active</a>\n        <a class="dropdown-item" href="#">Recovered</a>\n        <a class="dropdown-item" href="#">Deaths</a>\n        <a class="dropdown-item" href="#">Zone</a>\n        <a class="dropdown-item" href="#">Confirmed Gain</a>\n        <a class="dropdown-item" href="#">Recovered Gain</a>\n        <a class="dropdown-item" href="#">Deaths Gain</a>\n      </div>\n    </div>\n    <div id="topDistrictChartsContainer" class="row"></div>\n  </div>\n  <div id="stateContentMain" class="">\n    <div id="stateStatusBanner" class="row">\n      <div id="statePieChartContainer" class="col-md-2"></div>\n      <div id="stateLineChartContainer" class="col-md-2 d-none d-lg-block"></div>\n      <div id="statePieChartName" class="col-md-2"></div>\n      <div id="stateStatusBadgesContainer" class="col-md-6"></div>\n    </div>\n    <div class="row district-wide-graphs-row">\n      <div id="districtContainer">\n        <div id="districtsHeader" class="row">\n          <div class="col-sm-2">\n            <div class="distric-header-text">Districts</div>\n          </div>\n          <div class="col-sm-7 district-badge-items">\n            <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n            <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n            <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n          </div>\n          <div class="col-sm-3 sortby-dropdown">\n            <div id="sortByDropdown" class="dropdown sort-by-dropdown">\n              <button class="btn btn-secondary dropdown-toggle" type="button" id="sortBydropdownMenuButton"\n                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n                Sort By\n              </button>\n              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">\n                <a class="dropdown-item" href="#">Confirmed</a>\n                <a class="dropdown-item" href="#">Active</a>\n                <a class="dropdown-item" href="#">Recovered</a>\n                <a class="dropdown-item" href="#">Deaths</a>\n                <a class="dropdown-item" href="#">Zone</a>\n                <a class="dropdown-item" href="#">Confirmed Gain</a>\n                <a class="dropdown-item" href="#">Recovered Gain</a>\n                <a class="dropdown-item" href="#">Deaths Gain</a>\n              </div>\n              <a id="sortOrderBtn" href="#" class="btn btn-secondary sort-order-btn" role="button" aria-pressed="true">\n                <i class="material-icons">sort</i>\n                <i class="material-icons arrow">arrow_downward</i>\n              </a>\n            </div>\n          </div>\n        </div>\n        <div class="border-bottom"></div>\n        <div id="districtChartsContainer"></div>\n      </div>\n    </div>\n  </div>\n  <div class="border-top my-3"></div>\n  <div class="row">\n    <div id="footerBar" class="col">\n      <div id="footerCreditsText">Data Source: www.covid19india.org</div>\n      <div id="footerDevText">Developed by Uday Bhasker. Work in progress.</div>\n    </div>\n  </div>\n</div>';
+__p+='<div class="container">\n  <div class="row">\n    <div id="titleBar" class="col">\n      <div id="pageTitle">India COVID-19 Tracker</div>\n    </div>\n  </div>\n  <div class="border-top"></div>\n  <div class="container country-chart-container">\n    <div class="row">\n      <div class="col-md-4 align-self-center">\n        <div id="countryPieChartContainer"></div>\n      </div>\n      <div class="col-md-8 align-self-center">\n        <div id="countryLineChartContainer"></div>\n      </div>\n    </div>\n  </div>\n  <div id="selectionNavBar" class="row">\n    <div class="col">\n      <ul class="nav nav-tabs">\n        <li class="nav-item">\n          <a id="topDistrictsBtn" class="nav-link" href="#">Top 10 Districts</a>\n        </li>\n        <li id="stateSelectionDropdown" class="nav-item dropdown">\n          <a id="dropdownMenuButton" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"\n            aria-haspopup="true" aria-expanded="false">Select State</a>\n          <div class="dropdown-menu"></div>\n        </li>\n      </ul>\n    </div>\n  </div>\n  <div id="topDistrictContainer" class="row">\n    <div id="topDistrictSortByDropdown" class="mx-auto my-3">\n      <button id="topDistrictDropdownMenuButton" class="btn btn-secondary dropdown-toggle" type="button"\n        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Criteria:\n      </button>\n      <div class="dropdown-menu">\n        <a class="dropdown-item" href="#">Confirmed</a>\n        <a class="dropdown-item" href="#">Confirmed - Daily Increase</a>\n        <a class="dropdown-item" href="#">Active</a>\n        <a class="dropdown-item" href="#">Recovered</a>\n        <a class="dropdown-item" href="#">Recovered - Daily Increase</a>\n        <a class="dropdown-item" href="#">Deaths</a>\n        <a class="dropdown-item" href="#">Deaths - Daily Increase</a>\n        <a class="dropdown-item" href="#">Zone</a>\n      </div>\n    </div>\n    <div id="topDistrictChartsContainer" class="row"></div>\n  </div>\n  <div id="stateContentMain" class="">\n    <div id="stateStatusBanner" class="row">\n      <div id="statePieChartContainer" class="col-md-2"></div>\n      <div id="stateLineChartContainer" class="col-md-2 d-none d-lg-block"></div>\n      <div id="statePieChartName" class="col-md-2"></div>\n      <div id="stateStatusBadgesContainer" class="col-md-6"></div>\n    </div>\n    <div class="row district-wide-graphs-row">\n      <div id="districtContainer">\n        <div id="districtsHeader" class="row">\n          <div class="col-sm-2"> \n            <div class="distric-header-text">Districts</div>\n          </div>\n          <div class="col-sm-6 district-badge-items">\n            <div class="zones-header-text">Zones</div>\n            <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n            <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n            <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n          </div>\n          <div class="col-sm-4 sortby-dropdown">\n            <div id="sortByDropdown" class="dropdown sort-by-dropdown">\n              <button class="btn btn-secondary dropdown-toggle" type="button" id="sortBydropdownMenuButton"\n                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n                Sort By\n              </button>\n              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">\n                <a class="dropdown-item" href="#">Confirmed</a>\n                <a class="dropdown-item" href="#">Confirmed - Daily Increase</a>\n                <a class="dropdown-item" href="#">Active</a>\n                <a class="dropdown-item" href="#">Recovered</a>\n                <a class="dropdown-item" href="#">Recovered - Daily Increase</a>\n                <a class="dropdown-item" href="#">Deaths</a>\n                <a class="dropdown-item" href="#">Deaths - Daily Increase</a>\n                <a class="dropdown-item" href="#">Zone</a>\n              </div>\n              <a id="sortOrderBtn" href="#" class="btn btn-secondary sort-order-btn" role="button" aria-pressed="true">\n                <i class="material-icons">sort</i>\n                <i class="material-icons arrow">arrow_downward</i>\n              </a>\n            </div>\n          </div>\n        </div>\n        <div class="border-bottom"></div>\n        <div id="districtChartsContainer"></div>\n      </div>\n    </div>\n  </div>\n  <div class="border-top my-3"></div>\n  <div class="row">\n    <div id="footerBar" class="col">\n      <div id="footerCreditsText">Data Source: www.covid19india.org</div>\n      <div id="footerDevText">Developed by Uday Bhasker. Work in progress.</div>\n    </div>\n  </div>\n</div>';
 }
 return __p;
 };
@@ -68816,7 +68824,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         labels: {
           render: 'percentage',
           fontColor: 'white',
-          fontSize: 10,
+          fontSize: 9,
           precision: 0
         }
       },
@@ -68858,7 +68866,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="chart-zone-indicator"></div>\n<div class="pie-chart-inner-container">\n    <div class="pie-chart-canvas-container col-md-6">\n        <canvas id="'+
+__p+='<div class="chart-zone-indicator"></div>\n <div class="pie-chart-title" style="'+
+((__t=((!options.title.display && options.title.customTitle) ? '' : 'display:none'))==null?'':__t)+
+'">'+
+((__t=(options.title.text))==null?'':__t)+
+'</div>\n<div class="pie-chart-inner-container">\n    <div class="pie-chart-canvas-container col-md-6">\n        <canvas id="'+
 ((__t=(id))==null?'':__t)+
 '_canvas"></canvas>\n    </div>\n    <div class="badge-bar-container chart-legend col-md-6"></div>\n</div>\n';
 }

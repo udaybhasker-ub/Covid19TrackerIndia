@@ -29,7 +29,7 @@ export default Marionette.View.extend({
     initialize: function () {
         this.defaultSelections = {
             stateSelected: "Telangana",
-            sortBySelected: "Confirmed Gain",
+            sortBySelected: "Confirmed - Daily Increase",
             sortByOrderDescending: false
         };
         this.stateSelected = this.defaultSelections.stateSelected;
@@ -72,14 +72,10 @@ export default Marionette.View.extend({
                 };
                 stateInsights[key] = insight;
             });
-            console.dir(stateInsights);
-        });
-        this.showCountryPieChart().then(result => {
-            this.showCountryBarChart(result);
-        });
-        //this.showCountryLineChart();
-
-        this.loadChildViews();
+            //console.dir(stateInsights);
+        }).then(this.loadChildViews.bind(this))
+            .then(this.showCountryPieChart.bind(this))
+            .then(this.showCountryBarChart.bind(this));
     },
     events: {
         'click #stateSelectionDropdown a.dropdown-item': 'onStateSelectionChange',
@@ -158,14 +154,12 @@ export default Marionette.View.extend({
                 options: {
                     title: {
                         display: false,
+                        customTitle: false,
                         text: this.stateSelected,
                         fontSize: 20
                     },
                     legend: {
                         display: false
-                    },
-                    onClick: function (e) {
-                        console.log(e);
                     },
                     hideBadgeBar: true
                 },
@@ -173,15 +167,31 @@ export default Marionette.View.extend({
             this.$el.find('#statePieChartName').html(this.stateSelected);
             this.showChildView('stateStatusBadgesRegion', new BadgeBarView({ district }));
             this.showChildView('statePieChartRegion', statePieStart);
+        }).then(() => {
+            let loaded = {};
+            let distHistory = localStorage.getItem(this.stateSelected + "_districtHistory");
+            distHistory = distHistory ? JSON.parse(distHistory) : {};
+            if (distHistory && distHistory.result && !this.checkExpired(distHistory.lastUpdated, 24 * 60 * 60 * 1000)) {
+                loaded = Promise.resolve(distHistory.result);
+            } else {
+                loaded = new StateData({ type: 'history', stateName: this.stateSelected }).fetch().then((result) => {
+                    localStorage.setItem(this.stateSelected + "_districtHistory", JSON.stringify({
+                        result: result,
+                        lastUpdated: new Date()
+                    }));
+                    return result;
+                });
+            }
+            return loaded.then(this.drawStateLineChart.bind(this));
+        }).catch((err) => {
+            localStorage.removeItem(this.stateSelected + "_districtHistory");
+            localStorage.removeItem('allDistrictsLatest');
         });
-
-        const historyModel = new StateData({ type: 'history', stateName: this.stateSelected });
-        historyModel.fetch().then(this.drawStateLineChart.bind(this));
     },
     showCountryPieChart: function () {
         let latestCountry = new CountryData({ type: 'latest' });
         return latestCountry.fetch().then((result) => {
-            console.log(result);
+            //console.log(result);
             const summary = result['unofficial-summary'][0];
             const countryPieStart = new PieChart({
                 id: 'pieChartContainer',
@@ -195,6 +205,7 @@ export default Marionette.View.extend({
                 options: {
                     title: {
                         display: true,
+                        customTitle: false,
                         text: 'India',
                         fontSize: 20
                     },
@@ -212,7 +223,7 @@ export default Marionette.View.extend({
         statesDaily.fetch().then((result) => {
             result = result['states_daily'];
             let timeline = result.filter(a => a.status == 'Confirmed').map(d => d.date);
-            console.log(result);
+            //console.log(result);
             let datasets = [];
             Object.keys(StatesData).forEach(state => {
                 datasets.push({
@@ -244,7 +255,7 @@ export default Marionette.View.extend({
     },
     showCountryBarChart: function (result) {
         result = result.regional;
-        console.log(result);
+        //console.log(result);
         result.sort((a, b) => { return b.totalConfirmed - a.totalConfirmed });
         result = result.splice(0, 10);
         const data = {
@@ -257,7 +268,7 @@ export default Marionette.View.extend({
                     align: 'right',
                     anchor: 'start'
                 }
-            },{
+            }, {
                 label: "Deaths",
                 data: result.map(a => a.deaths),
                 backgroundColor: 'rgba(237, 85, 59, 0.8)',
@@ -266,7 +277,7 @@ export default Marionette.View.extend({
                     align: 'center',
                     anchor: 'center'
                 }
-            },{
+            }, {
                 label: "Active",
                 data: result.map(a => a.totalConfirmed - a.discharged - a.deaths),
                 backgroundColor: 'rgba(32, 99, 155, 0.8)',
@@ -328,15 +339,16 @@ export default Marionette.View.extend({
         });
         this.showChildView('stateLineChartRegion', stateLineChart);
     },
-    checkExpired: function (date) {
-        const EXPIRE_DURATION = 5 * 60 * 1000;
-        date = new Date(date.getTime() + EXPIRE_DURATION);
+    checkExpired: function (date, expireMillis) {
+        date = new Date(new Date(date).getTime() + expireMillis);
         return date.getTime() < new Date().getTime();
     },
     getAllDistrictsData: function () {
         let loaded;
-        if (this.allDistrictData && this.allDistrictData.result && !this.checkExpired(this.allDistrictData.lastUpdated)) {
-            loaded = Promise.resolve(this.allDistrictData.result);
+        let allDistrictData = localStorage.getItem('allDistrictsLatest');
+        allDistrictData = allDistrictData ? JSON.parse(allDistrictData) : {};
+        if (allDistrictData && allDistrictData.result && !this.checkExpired(allDistrictData.lastUpdated, 5 * 60 * 1000)) {
+            loaded = Promise.resolve(allDistrictData.result);
         } else {
             const opts = { stateName: "all" };
             loaded = new DistrictStats(opts).fetch().then((districtStatsResults) => {
@@ -353,8 +365,8 @@ export default Marionette.View.extend({
                             if (zone.zone) countryZoneStats[zone.zone]++;
                         });
                     });
-                    this.allDistrictData = { lastUpdated: new Date(), result: districtStatsResults };
-                    return this.allDistrictData.result;
+                    localStorage.setItem("allDistrictsLatest", JSON.stringify({ lastUpdated: new Date(), result: districtStatsResults }));
+                    return districtStatsResults;
                 });
             });
         }
@@ -406,7 +418,7 @@ export default Marionette.View.extend({
     prepareDistrictData: function (result) {
         let stateName = this.stateSelected, sortBy = this.sortBySelected, sortByOrderDescending = this.sortByOrderDescending;
         return new Promise((resolve, rej) => {
-            console.log(result);
+            //console.log(result);
             let districts = [], stateZoneStats = {
                 Red: 0,
                 Orange: 0,
@@ -422,7 +434,8 @@ export default Marionette.View.extend({
                     district,
                     options: {
                         title: {
-                            display: true,
+                            display: false,
+                            customTitle: true,
                             text: key + (result.showStateName ? ' (' + district.state + ')' : ''),
                             fontSize: result.showStateName ? 13 : 17
                         },
@@ -454,17 +467,17 @@ export default Marionette.View.extend({
                 if (b.zone && a.zone) {
                     flag = zones[b.zone.zone] - zones[a.zone.zone];
                 } else flag = b.active - a.active;
-            } else if (sortBy == 'Confirmed Gain') {
+            } else if (sortBy == 'Confirmed - Daily Increase') {
                 if (b.delta && a.delta) {
                     flag = b.delta.confirmed - a.delta.confirmed;
                 }
                 if (!flag) flag = b.confirmed - a.confirmed;
-            } else if (sortBy == 'Recovered Gain') {
+            } else if (sortBy == 'Recovered - Daily Increase') {
                 if (b.delta && a.delta) {
                     flag = b.delta.recovered - a.delta.recovered;
                 }
                 if (!flag) flag = b.recovered - a.recovered;
-            } else if (sortBy == 'Deaths Gain') {
+            } else if (sortBy == 'Deaths - Daily Increase') {
                 if (b.delta && a.delta) {
                     flag = b.delta.deceased - a.delta.deceased;
                 }

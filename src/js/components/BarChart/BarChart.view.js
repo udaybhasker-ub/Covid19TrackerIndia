@@ -28,7 +28,8 @@ export default Marionette.View.extend({
                         size: 10,
                     },
                     formatter: Math.round
-                }
+                },
+                labels: false
             },
             scales: {
                 xAxes: [{
@@ -54,10 +55,12 @@ export default Marionette.View.extend({
         if (isMobile) {
             type = 'bar';
             data.options.aspectRatio = 1;
+            defaults.plugins.datalabels = false;
         } else type = 'horizontalBar';
 
         const chart = new Chart($canvas, {
-            type, data: data.data, options: { ...defaults, ...data.options }, plugins: [ChartDataLabels]
+            type, data: data.data, options: { ...defaults, ...data.options },
+            plugins: [ChartDataLabels]
         });
 
         $canvas.on('click', (evt) => {

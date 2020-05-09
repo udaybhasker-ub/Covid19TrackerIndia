@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "26c98ef180c21d4bcc86";
+/******/ 	var hotCurrentHash = "49fcd4288fec3a336268";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -64670,6 +64670,17 @@ module.exports = function (list, options) {
 
 /***/ }),
 
+/***/ "./node_modules/underscore-template-loader/file-loader.js?url=..%2F..%2F..%2Fimg%2Ficons%2Ficons8-airplane-take-off-50.png!./src/img/icons/icons8-airplane-take-off-50.png":
+/*!*********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/underscore-template-loader/file-loader.js?url=..%2F..%2F..%2Fimg%2Ficons%2Ficons8-airplane-take-off-50.png!./src/img/icons/icons8-airplane-take-off-50.png ***!
+  \*********************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "images/21b07b57021e4ef37154b436baf1dca9.png";
+
+/***/ }),
+
 /***/ "./node_modules/underscore/modules/index-all.js":
 /*!******************************************************!*\
   !*** ./node_modules/underscore/modules/index-all.js ***!
@@ -67949,6 +67960,103 @@ return __p;
 
 /***/ }),
 
+/***/ "./src/js/components/CriteriaDropDown/CriteriaDropDown.view.js":
+/*!*********************************************************************!*\
+  !*** ./src/js/components/CriteriaDropDown/CriteriaDropDown.view.js ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var backbone_marionette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! backbone.marionette */ "./node_modules/backbone.marionette/lib/backbone.marionette.js");
+/* harmony import */ var backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(backbone_marionette__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _CriteriaDropdown_view_jst__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CriteriaDropdown.view.jst */ "./src/js/components/CriteriaDropDown/CriteriaDropdown.view.jst");
+/* harmony import */ var _CriteriaDropdown_view_jst__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_CriteriaDropdown_view_jst__WEBPACK_IMPORTED_MODULE_1__);
+
+
+/* harmony default export */ __webpack_exports__["default"] = (backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default.a.View.extend({
+  template: _CriteriaDropdown_view_jst__WEBPACK_IMPORTED_MODULE_1___default.a,
+  tagName: 'div',
+  className: 'dropdown sort-by-dropdown',
+  id: function id() {
+    return this.model.get('id');
+  },
+  initialize: function initialize(options) {
+    this.sortBySelected = options.defaultSortByOption;
+    options.defaultSortOrderSelected = false;
+    this.sortOrderSelected = options.defaultSortOrderSelected;
+    this.defaultLabels = ['Confirmed', 'Confirmed - Daily Increase', 'Active', 'Recovered', 'Recovered - Daily Increase', 'Deaths', 'Deaths - Daily Increase', 'Zone'];
+    this.model = new Backbone.Model(options);
+  },
+  events: {
+    'click a.dropdown-item': 'onSortBySelectionChange',
+    'click a.sort-order-btn': 'onSortOrderChangeBtnClick'
+  },
+  onSortBySelectionChange: function onSortBySelectionChange(e) {
+    e.preventDefault();
+    this.sortBySelected = $(e.target).html();
+    this.sortOrderSelected = this.model.get('defaultSortOrderSelected');
+    this.updateSortButtons();
+    var cb = this.model.get('callback');
+    if (cb) cb(this.sortBySelected, this.sortOrderSelected);
+  },
+  onSortOrderChangeBtnClick: function onSortOrderChangeBtnClick(e) {
+    e.preventDefault();
+    this.sortOrderSelected = !this.sortOrderSelected;
+    this.updateSortButtons();
+    var cb = this.model.get('callback');
+    if (cb) cb(this.sortBySelected, this.sortOrderSelected);
+  },
+  onRender: function onRender() {
+    var _this = this;
+
+    var labels = this.model.get('labels') || this.defaultLabels;
+    labels.forEach(function (entry) {
+      var option = $('<a/>', {
+        'class': 'dropdown-item',
+        href: '#'
+      });
+      option.html(entry);
+
+      _this.$el.find('.dropdown-menu').append(option);
+    });
+    var sortOrderDisabled = this.model.get('sortOrderDisabled');
+
+    if (sortOrderDisabled) {
+      this.$el.find('.sort-order-btn').hide();
+    }
+
+    this.updateSortButtons();
+  },
+  updateSortButtons: function updateSortButtons() {
+    this.$el.find('.sort-by-selection-btn').html(this.model.get('label') + ': ' + this.sortBySelected);
+    this.$el.find('.sort-order-btn').find('.arrow').html('arrow_' + (this.sortOrderSelected ? 'upward' : 'downward'));
+  }
+}));
+
+/***/ }),
+
+/***/ "./src/js/components/CriteriaDropDown/CriteriaDropdown.view.jst":
+/*!**********************************************************************!*\
+  !*** ./src/js/components/CriteriaDropDown/CriteriaDropdown.view.jst ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<button class="btn btn-secondary dropdown-togglen sort-by-selection-btn" type="button" data-toggle="dropdown"\n  aria-haspopup="true" aria-expanded="false">\n  '+
+((__t=(label))==null?'':__t)+
+'\n</button>\n<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"></div>\n<a href="#" class="btn btn-secondary sort-order-btn" role="button" aria-pressed="true">\n  <i class="material-icons">sort</i>\n  <i class="material-icons arrow">arrow_downward</i>\n</a>';
+}
+return __p;
+};
+
+
+/***/ }),
+
 /***/ "./src/js/components/LineChart/LineChart.view.js":
 /*!*******************************************************!*\
   !*** ./src/js/components/LineChart/LineChart.view.js ***!
@@ -68083,6 +68191,8 @@ var _data_States_json__WEBPACK_IMPORTED_MODULE_9___namespace = /*#__PURE__*/__we
 /* harmony import */ var _Models_CountryData_model__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../Models/CountryData.model */ "./src/js/Models/CountryData.model.js");
 /* harmony import */ var _Models_StatesDaily_model__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../Models/StatesDaily.model */ "./src/js/Models/StatesDaily.model.js");
 /* harmony import */ var _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../BadgeBar/BadgeBar.view */ "./src/js/components/BadgeBar/BadgeBar.view.js");
+/* harmony import */ var _ZoneRestrictions_ZoneRestrictions_view__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../ZoneRestrictions/ZoneRestrictions.view */ "./src/js/components/ZoneRestrictions/ZoneRestrictions.view.js");
+/* harmony import */ var _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../CriteriaDropDown/CriteriaDropDown.view */ "./src/js/components/CriteriaDropDown/CriteriaDropDown.view.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -68114,6 +68224,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
+
 /* harmony default export */ __webpack_exports__["default"] = (backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default.a.View.extend({
   template: _MainView_view_jst__WEBPACK_IMPORTED_MODULE_1___default.a,
   tagName: 'div',
@@ -68126,7 +68238,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     stateStatusBadgesRegion: "#stateStatusBadgesContainer",
     stateLineChartRegion: '#stateLineChartContainer',
     districtPieChartRegion: '#districtChartsContainer',
-    topDistrictPieChartRegion: '#topDistrictChartsContainer'
+    topDistrictPieChartRegion: '#topDistrictChartsContainer',
+    zoneRestrictionsRegion: '#zoneRestrictionsContainer',
+    stateListPieChartRegion: '#stateListPieChartContainer'
   },
   initialize: function initialize() {
     this.defaultSelections = {
@@ -68135,19 +68249,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       sortByOrderDescending: false
     };
     this.stateSelected = this.defaultSelections.stateSelected;
-    this.sortBySelected = this.defaultSelections.sortBySelected;
-    this.sortByOrderDescending = this.defaultSelections.sortByOrderDescending;
     var defaults = {
       deaths: '',
       discharged: '',
       loc: this.stateSelected,
       totalConfirmed: ''
     };
-    this.districtHistory = {};
     this.model = new Backbone.Model(_objectSpread({}, defaults));
     Backbone.Radio.channel('user').on('changeState', this.changeStateSelection.bind(this));
   },
   onRender: function onRender() {
+    var _this = this;
+
+    this.hideAllTabContainers();
+    this.showChildView('districtPieChartRegion', new _PieChartCollection_PieChartCollection_view__WEBPACK_IMPORTED_MODULE_7__["default"]({
+      id: this.stateSelected
+    }));
+    this.showChildView('stateListPieChartRegion', new _PieChartCollection_PieChartCollection_view__WEBPACK_IMPORTED_MODULE_7__["default"]({
+      id: 'India'
+    }));
+    this.showChildView('zoneRestrictionsRegion', new _ZoneRestrictions_ZoneRestrictions_view__WEBPACK_IMPORTED_MODULE_13__["default"]());
     var $ddMenu = this.$el.find('#stateSelectionDropdown > .dropdown-menu');
     Object.keys(_data_States_json__WEBPACK_IMPORTED_MODULE_9__).forEach(function (state) {
       $ddMenu.append($('<a/>', {
@@ -68155,210 +68276,283 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         'href': '#'
       }).html(state));
     });
-    this.getAllDistrictsData().then(function (allDistrictData) {
-      var stateInsights = {};
-      Object.keys(allDistrictData).forEach(function (key) {
-        var state = allDistrictData[key];
-        var insight = {
-          code: state.statecode,
-          totalDistricts: Object.keys(state.districtData).length,
-          active: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + obj.active;
+    this.getAllDistrictsData().then(this.getStateInsights.bind(this)).then(function (statewiseData) {
+      _this.showCountryBarChart(statewiseData);
+
+      return {
+        active: Object.values(statewiseData).reduce(function (total, obj) {
+          return total + obj.active;
+        }, 0),
+        confirmed: Object.values(statewiseData).reduce(function (total, obj) {
+          return total + obj.confirmed;
+        }, 0),
+        deceased: Object.values(statewiseData).reduce(function (total, obj) {
+          return total + obj.deceased;
+        }, 0),
+        recovered: Object.values(statewiseData).reduce(function (total, obj) {
+          return total + obj.recovered;
+        }, 0),
+        delta: {
+          confirmed: Object.values(statewiseData).reduce(function (total, obj) {
+            return total + obj.delta.confirmed;
           }, 0),
+          deceased: Object.values(statewiseData).reduce(function (total, obj) {
+            return total + obj.delta.deceased;
+          }, 0),
+          recovered: Object.values(statewiseData).reduce(function (total, obj) {
+            return total + obj.delta.recovered;
+          }, 0)
+        }
+      };
+    }).then(this.showCountryPieChart.bind(this)).then(function () {
+      var $mainContainer = _this.getChildView('stateListPieChartRegion').$el.parent();
+
+      if (!$mainContainer.find('#stateListCriteriaDropDown').is(':visible')) {
+        $mainContainer.prepend(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_14__["default"]({
+          id: 'stateListCriteriaDropDown',
+          label: 'Criteria',
+          defaultSortByOption: _this.defaultSelections.sortBySelected,
+          sortOrderDisabled: false,
+          callback: function callback(changedSortBy, changedSortOrder) {
+            console.log('selection changed:' + changedSortBy);
+
+            _this.getStateList(changedSortBy, changedSortOrder);
+          }
+        }).render().el);
+      }
+
+      _this.getStateList(_this.defaultSelections.sortBySelected, _this.defaultSelections.sortByOrderDescending);
+    });
+  },
+  getStateInsights: function getStateInsights(allDistrictData) {
+    var stateInsights = {};
+    Object.keys(allDistrictData).forEach(function (key) {
+      var state = allDistrictData[key];
+      var insight = {
+        loc: key,
+        totalDistricts: Object.keys(state.districtData).length,
+        active: Object.values(state.districtData).reduce(function (total, obj) {
+          return total + obj.active;
+        }, 0),
+        confirmed: Object.values(state.districtData).reduce(function (total, obj) {
+          return total + obj.confirmed;
+        }, 0),
+        deceased: Object.values(state.districtData).reduce(function (total, obj) {
+          return total + obj.deceased;
+        }, 0),
+        recovered: Object.values(state.districtData).reduce(function (total, obj) {
+          return total + obj.recovered;
+        }, 0),
+        delta: {
           confirmed: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + obj.confirmed;
+            return total + obj.delta.confirmed;
           }, 0),
           deceased: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + obj.deceased;
+            return total + obj.delta.deceased;
           }, 0),
           recovered: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + obj.recovered;
+            return total + obj.delta.recovered;
+          }, 0)
+        },
+        zones: {
+          Red: Object.values(state.districtData).reduce(function (total, obj) {
+            return total + (obj.zone && obj.zone.zone == 'Red' ? 1 : 0);
           }, 0),
-          delta: {
-            confirmed: Object.values(state.districtData).reduce(function (total, obj) {
-              return total + obj.delta.confirmed;
-            }, 0),
-            deceased: Object.values(state.districtData).reduce(function (total, obj) {
-              return total + obj.delta.deceased;
-            }, 0),
-            recovered: Object.values(state.districtData).reduce(function (total, obj) {
-              return total + obj.delta.recovered;
-            }, 0)
-          }
-        };
-        stateInsights[key] = insight;
-      }); //console.dir(stateInsights);
-    }).then(this.loadChildViews.bind(this)).then(this.showCountryPieChart.bind(this)).then(this.showCountryBarChart.bind(this));
+          Orange: Object.values(state.districtData).reduce(function (total, obj) {
+            return total + (obj.zone && obj.zone.zone == 'Orange' ? 1 : 0);
+          }, 0),
+          Green: Object.values(state.districtData).reduce(function (total, obj) {
+            return total + (obj.zone && obj.zone.zone == 'Green' ? 1 : 0);
+          }, 0)
+        }
+      };
+      stateInsights[key] = insight;
+    });
+    return stateInsights;
   },
   events: {
     'click #stateSelectionDropdown a.dropdown-item': 'onStateSelectionChange',
     'click #sortByDropdown a.dropdown-item': 'onSortBySelectionChange',
-    'click #topDistrictSortByDropdown a.dropdown-item': 'onTopDistrictsCriteriaChange',
     'click #sortOrderBtn': 'onSortOrderSelectionChange',
-    'click #topDistrictsBtn': 'showTopDistricts'
+    'click #topDistrictsBtn': 'showTopDistricts',
+    'click #getStatesBtn': 'onStateListNavBtnClick'
   },
-  onTopDistrictsCriteriaChange: function onTopDistrictsCriteriaChange(e) {
+  onStateListNavBtnClick: function onStateListNavBtnClick(e) {
     e.preventDefault();
-    this.sortBySelected = $(e.target).html();
-    this.getTopDistricts($(e.target).html(), this.defaultSelections.sortByOrderDescending);
+    this.getStateList(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
+  },
+  getStateList: function getStateList(sortByOption, sortOrderDesc) {
+    var _this2 = this;
+
+    this.getAllDistrictsData().then(this.getStateInsights.bind(this)).then(function (insights) {
+      return _this2.prepareStateData(insights, sortByOption, sortOrderDesc);
+    }).then(function (statewiseData) {
+      _this2.hideAllTabContainers();
+
+      _this2.$el.find('#stateListPieChartContainer').show();
+
+      _this2.$el.find('#getStatesBtn').addClass('active');
+
+      _this2.getChildView('stateListPieChartRegion').collection.reset(statewiseData);
+    });
   },
   showTopDistricts: function showTopDistricts(e) {
     e.preventDefault();
-    this.$el.find('#stateContentMain').hide();
     this.getTopDistricts(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
   },
   onStateSelectionChange: function onStateSelectionChange(e) {
     e.preventDefault();
     this.changeStateSelection($(e.target).html());
   },
-  onSortBySelectionChange: function onSortBySelectionChange(e) {
-    e.preventDefault();
-    this.sortBySelected = $(e.target).html();
-    this.getStateDistricts();
-  },
-  onSortOrderSelectionChange: function onSortOrderSelectionChange(e) {
-    e.preventDefault();
-    this.sortByOrderDescending = !this.sortByOrderDescending;
-    this.getStateDistricts();
+  hideAllTabContainers: function hideAllTabContainers() {
+    /*this.getChildView('zoneRestrictionsRegion').el.hide();
+    this.$el.find('#stateChartsMainContainer').hide();
+    this.$el.find('#topDistrictMainContainer').hide();
+    this.$el.find('#topDistrictMainContainer').hide();*/
+    $('.tab-item-container').hide();
+    $('#selectionNavBar').find('a').removeClass('active');
   },
   changeStateSelection: function changeStateSelection(state) {
     if (state == "Telengana") state = "Telangana";
     this.stateSelected = state;
-    this.sortBySelected = this.defaultSelections.sortBySelected;
-    this.sortByOrderDescending = this.defaultSelections.sortByOrderDescending;
     this.$el.find('#dropdownMenuButton').html(this.stateSelected); //this.resetChildViews();
 
-    this.loadChildViews();
+    this.loadStateCharts();
   },
   resetChildViews: function resetChildViews() {
     this.getChildView('districtPieChartRegion').destroy();
     this.getChildView('statePieChartRegion').destroy();
     this.getChildView('stateLineChartRegion').destroy();
   },
-  loadChildViews: function loadChildViews() {
-    var _this = this;
+  loadStateCharts: function loadStateCharts() {
+    var _this3 = this;
 
-    this.$el.find('#stateContentMain').show();
-    this.$el.find('#topDistrictContainer').hide();
-    this.$el.find('#topDistrictsBtn').removeClass('active');
+    this.hideAllTabContainers();
+    var $mainContainer = this.$el.find('#stateChartsMainContainer');
+    $mainContainer.show();
     this.$el.find('#dropdownMenuButton').addClass('active');
-    this.showChildView('districtPieChartRegion', new _PieChartCollection_PieChartCollection_view__WEBPACK_IMPORTED_MODULE_7__["default"]({
-      id: this.stateSelected
-    }));
-    this.getStateDistricts().then(function (districts) {
-      var data = {
-        totalConfirmed: districts.reduce(function (tot, arr) {
-          return tot + arr.district.confirmed;
-        }, 0),
-        deaths: districts.reduce(function (tot, arr) {
-          return tot + arr.district.deceased;
-        }, 0),
-        discharged: districts.reduce(function (tot, arr) {
-          return tot + arr.district.recovered;
-        }, 0),
-        delta: {
-          confirmed: districts.reduce(function (tot, arr) {
-            return tot + arr.district.delta.confirmed;
-          }, 0),
-          deceased: districts.reduce(function (tot, arr) {
-            return tot + arr.district.delta.deceased;
-          }, 0),
-          recovered: districts.reduce(function (tot, arr) {
-            return tot + arr.district.delta.recovered;
-          }, 0)
+
+    if (!this.$el.find('#stateDistrictsCriteriaDropDown').is(':visible')) {
+      $mainContainer.find('.sortby-dropdown').append(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_14__["default"]({
+        id: 'stateDistrictsCriteriaDropDown',
+        label: 'Sort By',
+        defaultSortByOption: this.defaultSelections.sortBySelected,
+        sortOrderDisabled: false,
+        callback: function callback(changedSortBy, changedSortOrder) {
+          console.log('selection changed:' + changedSortBy);
+
+          _this3.loadStateDistrictCharts(changedSortBy, changedSortOrder);
         }
-      };
-      var district = {
-        confirmed: data.totalConfirmed,
-        active: data.totalConfirmed - data.deaths - data.discharged,
-        deceased: data.deaths,
-        recovered: data.discharged,
-        delta: data.delta
-      };
-      var statePieStart = new _PieChart_PieChart_view__WEBPACK_IMPORTED_MODULE_4__["default"]({
-        id: 'pieChartContainer',
-        "className": 'pie-chart',
-        district: district,
-        options: {
-          title: {
-            display: false,
-            customTitle: false,
-            text: _this.stateSelected,
-            fontSize: 20
-          },
-          legend: {
-            display: false
-          },
-          hideBadgeBar: true
-        }
-      });
-
-      _this.$el.find('#statePieChartName').html(_this.stateSelected);
-
-      _this.showChildView('stateStatusBadgesRegion', new _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_12__["default"]({
-        district: district
-      }));
-
-      _this.showChildView('statePieChartRegion', statePieStart);
-    });
-    var loaded = {};
-    var distHistory = this.districtHistory[this.stateSelected];
-
-    if (distHistory && !this.checkExpired(distHistory.lastUpdated, 24 * 60 * 60 * 1000)) {
-      loaded = Promise.resolve(distHistory.result);
-    } else {
-      loaded = new _Models_StateData_model__WEBPACK_IMPORTED_MODULE_2__["default"]({
-        type: 'history',
-        stateName: this.stateSelected
-      }).fetch();
+      }).render().el);
     }
 
-    loaded.then(function (result) {
-      _this.districtHistory[_this.stateSelected] = {
-        result: result,
-        lastUpdated: new Date()
-      };
-      return result;
-    }).then(this.drawStateLineChart.bind(this));
+    this.loadStateDistrictCharts().then(this.showStatePieStart.bind(this)).then(this.prepareStateLineChartData.bind(this)).then(this.drawStateLineChart.bind(this)).catch(function (err) {
+      localStorage.removeItem(_this3.stateSelected + "_districtHistory");
+      localStorage.removeItem('allDistrictsLatest');
+    });
   },
-  showCountryPieChart: function showCountryPieChart() {
-    var _this2 = this;
+  loadStateDistrictCharts: function loadStateDistrictCharts(sortBySelected, sortByOrderDescending) {
+    var _this4 = this;
 
-    var latestCountry = new _Models_CountryData_model__WEBPACK_IMPORTED_MODULE_10__["default"]({
-      type: 'latest'
-    });
-    return latestCountry.fetch().then(function (result) {
-      //console.log(result);
-      var summary = result['unofficial-summary'][0];
-      var countryPieStart = new _PieChart_PieChart_view__WEBPACK_IMPORTED_MODULE_4__["default"]({
-        id: 'pieChartContainer',
-        "className": 'country-pie-chart',
-        district: {
-          confirmed: summary.total,
-          active: summary.active,
-          deceased: summary.deaths,
-          recovered: summary.recovered
-        },
-        options: {
-          title: {
-            display: true,
-            customTitle: false,
-            text: 'India',
-            fontSize: 20
-          },
-          legend: {
-            display: false
-          }
-        }
+    var stateName = this.stateSelected;
+    sortBySelected = sortBySelected || this.defaultSelections.sortBySelected;
+    sortByOrderDescending = sortByOrderDescending || this.defaultSelections.sortByOrderDescending;
+    return this.getAllDistrictsData().then(function (allDistrictData) {
+      var districtData = allDistrictData[stateName].districtData;
+      return {
+        districtData: districtData,
+        showStateName: false
+      };
+    }).then(this.prepareDistrictData.bind(this)).then(function (_ref) {
+      var districts = _ref.districts,
+          stateZoneStats = _ref.stateZoneStats;
+      districts = _this4.sortDistricts(districts, sortBySelected, sortByOrderDescending);
+
+      _this4.getChildView('districtPieChartRegion').collection.reset(districts);
+
+      Object.keys(stateZoneStats).forEach(function (key) {
+        var $badge = _this4.$el.find('.zone-badge-' + key);
+
+        $badge.html(stateZoneStats[key]);
       });
-
-      _this2.showChildView('countryPieChartRegion', countryPieStart);
-
-      return result;
+      return districts;
     });
+  },
+  showStatePieStart: function showStatePieStart(districts) {
+    var data = {
+      totalConfirmed: districts.reduce(function (tot, arr) {
+        return tot + arr.district.confirmed;
+      }, 0),
+      deaths: districts.reduce(function (tot, arr) {
+        return tot + arr.district.deceased;
+      }, 0),
+      discharged: districts.reduce(function (tot, arr) {
+        return tot + arr.district.recovered;
+      }, 0),
+      delta: {
+        confirmed: districts.reduce(function (tot, arr) {
+          return tot + arr.district.delta.confirmed;
+        }, 0),
+        deceased: districts.reduce(function (tot, arr) {
+          return tot + arr.district.delta.deceased;
+        }, 0),
+        recovered: districts.reduce(function (tot, arr) {
+          return tot + arr.district.delta.recovered;
+        }, 0)
+      }
+    };
+    var district = {
+      confirmed: data.totalConfirmed,
+      active: data.totalConfirmed - data.deaths - data.discharged,
+      deceased: data.deaths,
+      recovered: data.discharged,
+      delta: data.delta
+    };
+    var statePieStart = new _PieChart_PieChart_view__WEBPACK_IMPORTED_MODULE_4__["default"]({
+      id: 'pieChartContainer',
+      "className": 'pie-chart',
+      district: district,
+      options: {
+        title: {
+          display: false,
+          customTitle: false,
+          text: this.stateSelected,
+          fontSize: 20
+        },
+        legend: {
+          display: false
+        },
+        hideBadgeBar: true
+      }
+    });
+    this.$el.find('#statePieChartName').html(this.stateSelected);
+    this.showChildView('stateStatusBadgesRegion', new _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_12__["default"]({
+      district: district
+    }));
+    this.showChildView('statePieChartRegion', statePieStart);
+  },
+  showCountryPieChart: function showCountryPieChart(result) {
+    var countryPieStart = new _PieChart_PieChart_view__WEBPACK_IMPORTED_MODULE_4__["default"]({
+      id: 'pieChartContainer',
+      "className": 'country-pie-chart',
+      district: result,
+      options: {
+        title: {
+          display: true,
+          customTitle: false,
+          text: 'India',
+          fontSize: 20
+        },
+        legend: {
+          display: false
+        }
+      }
+    });
+    this.showChildView('countryPieChartRegion', countryPieStart);
+    return result;
   },
   showCountryLineChart: function showCountryLineChart() {
-    var _this3 = this;
+    var _this5 = this;
 
     var statesDaily = new _Models_StatesDaily_model__WEBPACK_IMPORTED_MODULE_11__["default"]();
     statesDaily.fetch().then(function (result) {
@@ -68402,21 +68596,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         yAxesUpperLimit: 10000
       });
 
-      _this3.showChildView('countryLineChartRegion', countryLineChart);
+      _this5.showChildView('countryLineChartRegion', countryLineChart);
     });
   },
   showCountryBarChart: function showCountryBarChart(result) {
-    result = result.regional; //console.log(result);
-
-    result.sort(function (a, b) {
-      return b.totalConfirmed - a.totalConfirmed;
+    result = Object.keys(result).sort(function (a, b) {
+      return result[b].confirmed - result[a].confirmed;
+    }).map(function (key) {
+      return result[key];
     });
     result = result.splice(0, 10);
     var data = {
       datasets: [{
         label: "Recovered",
         data: result.map(function (a) {
-          return a.discharged;
+          return a.recovered;
         }),
         backgroundColor: 'rgba(60, 174, 163, 0.8)',
         hoverBackgroundColor: 'rgba(60, 174, 163, 1)',
@@ -68427,7 +68621,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, {
         label: "Deaths",
         data: result.map(function (a) {
-          return a.deaths;
+          return a.deceased;
         }),
         backgroundColor: 'rgba(237, 85, 59, 0.8)',
         hoverBackgroundColor: 'rgba(237, 85, 59, 1)',
@@ -68438,7 +68632,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, {
         label: "Active",
         data: result.map(function (a) {
-          return a.totalConfirmed - a.discharged - a.deaths;
+          return a.confirmed - a.recovered - a.deceased;
         }),
         backgroundColor: 'rgba(32, 99, 155, 0.8)',
         hoverBackgroundColor: 'rgba(32, 99, 155, 1)',
@@ -68463,6 +68657,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     });
     this.showChildView('countryLineChartRegion', countryBarChart);
+    return result;
+  },
+  prepareStateLineChartData: function prepareStateLineChartData() {
+    var _this6 = this;
+
+    var loaded = {};
+    var distHistory = localStorage.getItem(this.stateSelected + "_districtHistory");
+    distHistory = distHistory ? JSON.parse(distHistory) : {};
+
+    if (distHistory && distHistory.result && !this.checkExpired(distHistory.lastUpdated, 24 * 60 * 60 * 1000)) {
+      loaded = Promise.resolve(distHistory.result);
+    } else {
+      loaded = new _Models_StateData_model__WEBPACK_IMPORTED_MODULE_2__["default"]({
+        type: 'history',
+        stateName: this.stateSelected
+      }).fetch().then(function (result) {
+        localStorage.setItem(_this6.stateSelected + "_districtHistory", JSON.stringify({
+          result: result,
+          lastUpdated: new Date()
+        }));
+        return result;
+      });
+    }
+
+    return loaded;
   },
   drawStateLineChart: function drawStateLineChart(result) {
     var timeline = result.map(function (a) {
@@ -68510,16 +68729,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.showChildView('stateLineChartRegion', stateLineChart);
   },
   checkExpired: function checkExpired(date, expireMillis) {
-    date = new Date(date.getTime() + expireMillis);
+    date = new Date(new Date(date).getTime() + expireMillis);
     return date.getTime() < new Date().getTime();
   },
   getAllDistrictsData: function getAllDistrictsData() {
-    var _this4 = this;
-
     var loaded;
+    var allDistrictData = localStorage.getItem('allDistrictsLatest');
+    allDistrictData = allDistrictData ? JSON.parse(allDistrictData) : {};
 
-    if (this.allDistrictData && this.allDistrictData.result && !this.checkExpired(this.allDistrictData.lastUpdated, 5 * 60 * 1000)) {
-      loaded = Promise.resolve(this.allDistrictData.result);
+    if (allDistrictData && allDistrictData.result && !this.checkExpired(allDistrictData.lastUpdated, 5 * 60 * 1000)) {
+      loaded = Promise.resolve(allDistrictData.result);
     } else {
       var opts = {
         stateName: "all"
@@ -68541,27 +68760,47 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               if (zone.zone) countryZoneStats[zone.zone]++;
             });
           });
-          _this4.allDistrictData = {
+          localStorage.setItem("allDistrictsLatest", JSON.stringify({
             lastUpdated: new Date(),
             result: districtStatsResults
-          };
-          return _this4.allDistrictData.result;
+          }));
+          return districtStatsResults;
         });
       });
     }
 
     return loaded;
   },
-  getTopDistricts: function getTopDistricts(criteria, orderDesc) {
-    var _this5 = this;
+  getTopDistricts: function getTopDistricts() {
+    var _this7 = this;
 
-    this.$el.find('#stateContentMain').hide();
-    this.$el.find('#topDistrictContainer').show();
+    this.hideAllTabContainers();
+    var $mainContainer = this.$el.find('#topDistrictMainContainer');
+    $mainContainer.show();
     this.$el.find('#topDistrictsBtn').addClass('active');
-    this.$el.find('#dropdownMenuButton').removeClass('active');
-    this.showChildView('topDistrictPieChartRegion', new _PieChartCollection_PieChartCollection_view__WEBPACK_IMPORTED_MODULE_7__["default"]({
-      id: 'topDistricts'
-    }));
+
+    if (!this.$el.find('#topDistrictsCriteriaDropDown').is(':visible')) {
+      $mainContainer.prepend(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_14__["default"]({
+        id: 'topDistrictsCriteriaDropDown',
+        label: 'Criteria',
+        defaultSortByOption: this.defaultSelections.sortBySelected,
+        sortOrderDisabled: true,
+        callback: function callback(changedSortBy, changedSortOrder) {
+          console.log('selection changed:' + changedSortBy);
+
+          _this7.renderTopDistricts(changedSortBy, changedSortOrder);
+        }
+      }).render().el);
+      this.showChildView('topDistrictPieChartRegion', new _PieChartCollection_PieChartCollection_view__WEBPACK_IMPORTED_MODULE_7__["default"]({
+        id: 'topDistricts'
+      }));
+    }
+
+    return this.renderTopDistricts(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
+  },
+  renderTopDistricts: function renderTopDistricts(criteria, orderDesc) {
+    var _this8 = this;
+
     return this.getAllDistrictsData().then(function (allDistrictData) {
       var allDistricts = [],
           result = {};
@@ -68573,7 +68812,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           allDistricts.push(d);
         });
       });
-      allDistricts = _this5.sortDistricts(allDistricts, criteria, orderDesc);
+      allDistricts = _this8.sortDistricts(allDistricts, criteria, orderDesc);
       allDistricts = allDistricts.splice(0, 10);
       allDistricts.forEach(function (dist) {
         result[dist.name] = dist;
@@ -68582,50 +68821,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         districtData: result,
         showStateName: true
       };
-    }).then(this.prepareDistrictData.bind(this)).then(function (_ref) {
-      var districts = _ref.districts,
-          stateZoneStats = _ref.stateZoneStats;
-
-      _this5.getChildView('topDistrictPieChartRegion').collection.reset(districts);
-
-      _this5.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
-
-      return districts;
-    });
-  },
-  getStateDistricts: function getStateDistricts() {
-    var _this6 = this;
-
-    var stateName = this.stateSelected;
-    return this.getAllDistrictsData().then(function (allDistrictData) {
-      return allDistrictData[stateName];
     }).then(this.prepareDistrictData.bind(this)).then(function (_ref2) {
       var districts = _ref2.districts,
           stateZoneStats = _ref2.stateZoneStats;
 
-      _this6.getChildView('districtPieChartRegion').collection.reset(districts);
+      _this8.getChildView('topDistrictPieChartRegion').collection.reset(districts); //this.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
 
-      Object.keys(stateZoneStats).forEach(function (key) {
-        var $badge = _this6.$el.find('.zone-badge-' + key);
-
-        $badge.html(stateZoneStats[key]);
-      });
-
-      _this6.$el.find('#sortByDropdown > button').html('Sort by: ' + _this6.sortBySelected);
-
-      _this6.$el.find('#sortOrderBtn > i.arrow').html("arrow_" + (_this6.sortByOrderDescending ? 'upward' : 'downward'));
 
       return districts;
     });
   },
   prepareDistrictData: function prepareDistrictData(result) {
-    var _this7 = this;
-
-    var stateName = this.stateSelected,
-        sortBy = this.sortBySelected,
-        sortByOrderDescending = this.sortByOrderDescending;
     return new Promise(function (resolve, rej) {
-      //console.log(result);
       var districts = [],
           stateZoneStats = {
         Red: 0,
@@ -68634,7 +68841,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       };
       Object.keys(result.districtData).forEach(function (key) {
         var district = result.districtData[key];
-        var containerID = stateName.split(' ').join('-') + "_" + key.split(' ').join('-').split('.').join('-') + '_pieChart';
+        var containerID = (district.state ? district.state.split(' ').join('-') + "_" : '') + key.split(' ').join('-').split('.').join('-') + '_pieChart';
         districts.push({
           id: containerID,
           title: key,
@@ -68654,11 +68861,41 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         });
         if (district.zone) stateZoneStats[district.zone.zone]++;
       });
-      districts = _this7.sortDistricts(districts, sortBy, sortByOrderDescending);
       resolve({
         districts: districts,
         stateZoneStats: stateZoneStats
       });
+    });
+  },
+  prepareStateData: function prepareStateData(result, sortBySelected, sortByOrderDescending) {
+    var _this9 = this;
+
+    return new Promise(function (resolve, rej) {
+      //console.log(result);
+      var stateList = [];
+      Object.keys(result).forEach(function (key) {
+        var state = result[key];
+        var containerID = key.split(' ').join('-') + '_pieChart';
+        stateList.push({
+          id: containerID,
+          title: key,
+          "className": 'district-pie-chart state-district-pie-chart',
+          district: state,
+          options: {
+            title: {
+              display: false,
+              customTitle: true,
+              text: key,
+              fontSize: 17
+            },
+            legend: {
+              display: false
+            }
+          }
+        });
+      });
+      stateList = _this9.sortDistricts(stateList, sortBySelected, sortByOrderDescending);
+      resolve(stateList);
     });
   },
   sortDistricts: function sortDistricts(districts, sortBy, sortByOrderDescending) {
@@ -68727,7 +68964,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="container">\n  <div class="row">\n    <div id="titleBar" class="col">\n      <div id="pageTitle">India COVID-19 Tracker</div>\n    </div>\n  </div>\n  <div class="border-top"></div>\n  <div class="container country-chart-container">\n    <div class="row">\n      <div class="col-md-4 align-self-center">\n        <div id="countryPieChartContainer"></div>\n      </div>\n      <div class="col-md-8 align-self-center">\n        <div id="countryLineChartContainer"></div>\n      </div>\n    </div>\n  </div>\n  <div id="selectionNavBar" class="row">\n    <div class="col">\n      <ul class="nav nav-tabs">\n        <li class="nav-item">\n          <a id="topDistrictsBtn" class="nav-link" href="#">Top 10 Districts</a>\n        </li>\n        <li id="stateSelectionDropdown" class="nav-item dropdown">\n          <a id="dropdownMenuButton" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"\n            aria-haspopup="true" aria-expanded="false">Select State</a>\n          <div class="dropdown-menu"></div>\n        </li>\n      </ul>\n    </div>\n  </div>\n  <div id="topDistrictContainer" class="row">\n    <div id="topDistrictSortByDropdown" class="mx-auto my-3">\n      <button id="topDistrictDropdownMenuButton" class="btn btn-secondary dropdown-toggle" type="button"\n        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Criteria:\n      </button>\n      <div class="dropdown-menu">\n        <a class="dropdown-item" href="#">Confirmed</a>\n        <a class="dropdown-item" href="#">Confirmed - Daily Increase</a>\n        <a class="dropdown-item" href="#">Active</a>\n        <a class="dropdown-item" href="#">Recovered</a>\n        <a class="dropdown-item" href="#">Recovered - Daily Increase</a>\n        <a class="dropdown-item" href="#">Deaths</a>\n        <a class="dropdown-item" href="#">Deaths - Daily Increase</a>\n        <a class="dropdown-item" href="#">Zone</a>\n      </div>\n    </div>\n    <div id="topDistrictChartsContainer" class="row"></div>\n  </div>\n  <div id="stateContentMain" class="">\n    <div id="stateStatusBanner" class="row">\n      <div id="statePieChartContainer" class="col-md-2"></div>\n      <div id="stateLineChartContainer" class="col-md-2 d-none d-lg-block"></div>\n      <div id="statePieChartName" class="col-md-2"></div>\n      <div id="stateStatusBadgesContainer" class="col-md-6"></div>\n    </div>\n    <div class="row district-wide-graphs-row">\n      <div id="districtContainer">\n        <div id="districtsHeader" class="row">\n          <div class="col-sm-2"> \n            <div class="distric-header-text">Districts</div>\n          </div>\n          <div class="col-sm-6 district-badge-items">\n            <div class="zones-header-text">Zones</div>\n            <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n            <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n            <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n          </div>\n          <div class="col-sm-4 sortby-dropdown">\n            <div id="sortByDropdown" class="dropdown sort-by-dropdown">\n              <button class="btn btn-secondary dropdown-toggle" type="button" id="sortBydropdownMenuButton"\n                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n                Sort By\n              </button>\n              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">\n                <a class="dropdown-item" href="#">Confirmed</a>\n                <a class="dropdown-item" href="#">Confirmed - Daily Increase</a>\n                <a class="dropdown-item" href="#">Active</a>\n                <a class="dropdown-item" href="#">Recovered</a>\n                <a class="dropdown-item" href="#">Recovered - Daily Increase</a>\n                <a class="dropdown-item" href="#">Deaths</a>\n                <a class="dropdown-item" href="#">Deaths - Daily Increase</a>\n                <a class="dropdown-item" href="#">Zone</a>\n              </div>\n              <a id="sortOrderBtn" href="#" class="btn btn-secondary sort-order-btn" role="button" aria-pressed="true">\n                <i class="material-icons">sort</i>\n                <i class="material-icons arrow">arrow_downward</i>\n              </a>\n            </div>\n          </div>\n        </div>\n        <div class="border-bottom"></div>\n        <div id="districtChartsContainer"></div>\n      </div>\n    </div>\n  </div>\n  <div class="border-top my-3"></div>\n  <div class="row">\n    <div id="footerBar" class="col">\n      <div id="footerCreditsText">Data Source: www.covid19india.org</div>\n      <div id="footerDevText">Developed by Uday Bhasker. Work in progress.</div>\n    </div>\n  </div>\n</div>';
+__p+='<div class="container">\n  <div class="row">\n    <div id="titleBar" class="col">\n      <div id="pageTitle">India COVID-19 Tracker</div>\n    </div>\n  </div>\n  <div class="border-top"></div>\n  <div class="container country-chart-container">\n    <div class="row">\n      <div class="col-md-4 align-self-center">\n        <div id="countryPieChartContainer"></div>\n      </div>\n      <div class="col-md-8 align-self-center">\n        <div id="countryLineChartContainer"></div>\n      </div>\n    </div>\n  </div>\n\n  <div id="selectionNavBar" class="row">\n    <div class="col">\n      <ul class="nav nav-tabs">\n        <li class="nav-item">\n          <a id="getStatesBtn" class="nav-link" href="#">States</a>\n        </li>\n        <li class="nav-item">\n          <a id="topDistrictsBtn" class="nav-link" href="#">Top 10 Districts</a>\n        </li>\n        <li id="stateSelectionDropdown" class="nav-item dropdown">\n          <a id="dropdownMenuButton" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"\n            aria-haspopup="true" aria-expanded="false">Select State</a>\n          <div class="dropdown-menu"></div>\n        </li>\n        <li class="nav-item">\n          <!--<a class="nav-link" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"\n            aria-controls="collapseExample">Zone Restrictions</a>-->\n        </li>\n      </ul>\n    </div>\n  </div>\n  <div id="zoneRestrictionsContainer" class="tab-item-container"></div>\n  <div id="topDistrictMainContainer" class="tab-item-container">\n    <div id="topDistrictChartsContainer" class="row"></div>\n  </div>\n  <div id="stateListPieChartContainer" class="tab-item-container"></div>\n  <div id="stateChartsMainContainer" class="tab-item-container">\n    <div id="stateContentMain" class="">\n      <div id="stateStatusBanner" class="row">\n        <div id="statePieChartContainer" class="col-md-2"></div>\n        <div id="stateLineChartContainer" class="col-md-2 d-none d-lg-block"></div>\n        <div id="statePieChartName" class="col-md-2"></div>\n        <div id="stateStatusBadgesContainer" class="col-md-6"></div>\n      </div>\n      <div class="row district-wide-graphs-row">\n        <div id="districtContainer">\n          <div id="districtsHeader" class="row">\n            <div class="col-sm-2">\n              <div class="distric-header-text">Districts</div>\n            </div>\n            <div class="col-sm-4 district-badge-items">\n              <div class="zones-header-text">Zones</div>\n              <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n              <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n              <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n            </div>\n            <div class="col-sm-6 sortby-dropdown">\n              \n            </div>\n          </div>\n          <div class="border-bottom"></div>\n          <div id="districtChartsContainer"></div>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class="border-top my-3"></div>\n  <div class="row">\n    <div id="footerBar" class="col">\n      <div id="footerCreditsText">Data Source: www.covid19india.org</div>\n      <div id="footerDevText">Developed by Uday Bhasker. Work in progress.</div>\n    </div>\n  </div>\n</div>';
 }
 return __p;
 };
@@ -68800,6 +69037,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
       $zoneIndecator.html('Zone updated ' + difference + ' days ago');
     }
+
+    if (district.zones) {
+      this.$el.find('.chart-zone-indicator').hide();
+      var $container = this.$el.find('.pie-chart-zone-badges').show();
+      Object.keys(district.zones).forEach(function (key) {
+        $container.find('.zone-badge-' + key).html(district.zones[key]);
+      });
+    } else this.$el.find('.pie-chart-zone-badges').hide();
   },
   getDateDiffInDays: function getDateDiffInDays(a, b) {
     var _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -68866,13 +69111,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="chart-zone-indicator"></div>\n <div class="pie-chart-title" style="'+
+__p+='<div class="chart-zone-indicator"></div>\n<div class="pie-chart-title col-xs-8" style="'+
 ((__t=((!options.title.display && options.title.customTitle) ? '' : 'display:none'))==null?'':__t)+
-'">'+
+'">\n    '+
 ((__t=(options.title.text))==null?'':__t)+
-'</div>\n<div class="pie-chart-inner-container">\n    <div class="pie-chart-canvas-container col-md-6">\n        <canvas id="'+
+'</div>\n<div class="pie-chart-zone-badges district-badge-items col-xs-4">\n    <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n    <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n    <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n</div>\n<div class="pie-chart-inner-container">\n    <div class="pie-chart-canvas-container col-md-6">\n        <canvas id="'+
 ((__t=(id))==null?'':__t)+
-'_canvas"></canvas>\n    </div>\n    <div class="badge-bar-container chart-legend col-md-6"></div>\n</div>\n';
+'_canvas"></canvas>\n    </div>\n    <div class="badge-bar-container chart-legend col-md-6"></div>\n</div>';
 }
 return __p;
 };
@@ -68905,6 +69150,52 @@ __webpack_require__.r(__webpack_exports__);
     this.id = options.id + '_pieChartCollection';
   }
 }));
+
+/***/ }),
+
+/***/ "./src/js/components/ZoneRestrictions/ZoneRestrictions.view.js":
+/*!*********************************************************************!*\
+  !*** ./src/js/components/ZoneRestrictions/ZoneRestrictions.view.js ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var backbone_marionette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! backbone.marionette */ "./node_modules/backbone.marionette/lib/backbone.marionette.js");
+/* harmony import */ var backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(backbone_marionette__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _ZoneRestrictions_view_jst__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ZoneRestrictions.view.jst */ "./src/js/components/ZoneRestrictions/ZoneRestrictions.view.jst");
+/* harmony import */ var _ZoneRestrictions_view_jst__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_ZoneRestrictions_view_jst__WEBPACK_IMPORTED_MODULE_1__);
+
+
+/* harmony default export */ __webpack_exports__["default"] = (backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default.a.View.extend({
+  template: _ZoneRestrictions_view_jst__WEBPACK_IMPORTED_MODULE_1___default.a,
+  tagName: 'div',
+  className: '',
+  id: 'zoneRestrictionContainer',
+  initialize: function initialize(options) {
+    this.model = new Backbone.Model(options);
+  },
+  onRender: function onRender() {}
+}));
+
+/***/ }),
+
+/***/ "./src/js/components/ZoneRestrictions/ZoneRestrictions.view.jst":
+/*!**********************************************************************!*\
+  !*** ./src/js/components/ZoneRestrictions/ZoneRestrictions.view.jst ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<div class="collapse" id="collapseExample">\n    <div class="card card-body row">\n        <div class="row">\n            <div class="col-sm">\n                <div class="zone-rules-text">\n                    Domestic and international air travel\n                </div>\n                <div class="zone-rules-img">\n                    <img src="' + __webpack_require__(/*! ./node_modules/underscore-template-loader/file-loader.js?url=..%2F..%2F..%2Fimg%2Ficons%2Ficons8-airplane-take-off-50.png!../../../img/icons/icons8-airplane-take-off-50.png */ "./node_modules/underscore-template-loader/file-loader.js?url=..%2F..%2F..%2Fimg%2Ficons%2Ficons8-airplane-take-off-50.png!./src/img/icons/icons8-airplane-take-off-50.png") + '"></img>\n                </div>\n            </div>\n            <div class="col-sm">\n                <div class="zone-rules-text">\n                    Domestic and international air travel\n                </div>\n                <div class="zone-rules-img">\n                    <img src="' + __webpack_require__(/*! ./node_modules/underscore-template-loader/file-loader.js?url=..%2F..%2F..%2Fimg%2Ficons%2Ficons8-airplane-take-off-50.png!../../../img/icons/icons8-airplane-take-off-50.png */ "./node_modules/underscore-template-loader/file-loader.js?url=..%2F..%2F..%2Fimg%2Ficons%2Ficons8-airplane-take-off-50.png!./src/img/icons/icons8-airplane-take-off-50.png") + '"></img>\n                </div>\n            </div>\n            <div class="col-sm">\n                <div class="zone-rules-text">\n                    Domestic and international air travel\n                </div>\n                <div class="zone-rules-img">\n                    <img src="' + __webpack_require__(/*! ./node_modules/underscore-template-loader/file-loader.js?url=..%2F..%2F..%2Fimg%2Ficons%2Ficons8-airplane-take-off-50.png!../../../img/icons/icons8-airplane-take-off-50.png */ "./node_modules/underscore-template-loader/file-loader.js?url=..%2F..%2F..%2Fimg%2Ficons%2Ficons8-airplane-take-off-50.png!./src/img/icons/icons8-airplane-take-off-50.png") + '"></img>\n                </div>\n            </div>\n          </div>\n    </div>\n</div>';
+}
+return __p;
+};
+
 
 /***/ }),
 

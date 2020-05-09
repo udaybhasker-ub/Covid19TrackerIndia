@@ -63,8 +63,16 @@ module.exports = {
         }]
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: ['file-loader']
+        test: /\.(png|jpg|jpeg|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              outputPath: "images",
+              esModule: false,
+            },
+          },
+        ],
       },
       {
         test: /jquery/,

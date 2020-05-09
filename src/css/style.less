@@ -70,6 +70,17 @@
     justify-content: center;
 }
 
+.state-district-pie-chart {
+    & > .pie-chart-title{
+        font-weight: bold;
+    }
+}
+
+.badge-bar-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
 .district-pie-chart {
     min-width: 210px;
     float: left;
@@ -78,6 +89,7 @@
     padding-bottom: 15px;
     background-color:#f7f7f7;
     border: solid 1px gray;
+    max-width: 89%;
 
     .pie-chart-canvas-container {
         max-width: 210px;
@@ -101,8 +113,15 @@
     .country-pie-chart {
         min-width: 50vw;
     }
+    .pie-chart-zone-badges{
+        display: none;
+    }
 }
+
 @media only screen and (max-width: 450px) {
+    .badge-bar-container {
+        margin-top: 0px;
+    }
     .district-pie-chart {
         & .badge.status-badge {
             width: 60px !important;
@@ -113,11 +132,27 @@
             display: none;
         }
     }
-}
+    .state-district-pie-chart {
+        & > .pie-chart-title{
+            margin: 5px 8px;
+            text-align: left;
+            display: inline-block;
+            font-size: 14px;
+            max-width: 55%;
+        }
 
-.badge-bar-container {
-    text-align: center;
-    margin-top: 10px;
+        .district-badge-items {
+            margin: 5px 8px;
+            display: inline-block;
+            float: right;
+
+            & > .badge {
+                margin: 0px 0px;
+                min-width: 24px;
+                font-size: 10px;
+            }
+        }
+    }
 }
 
 .badge-bar-content {
@@ -133,7 +168,7 @@
     }
     .badge-status-count{
         display: block;
-        font-size: 14pt;
+        font-size: 13pt;
         margin: 2px 0px;
     }
     
@@ -170,6 +205,22 @@
     }
 }
 
+@media only screen and (max-width: 450px) {
+    .badge-bar-content {
+        .badge-status-text {
+            font-size: 6pt;
+        }
+        .badge-status-count{
+            display: block;
+            font-size: 10pt;
+            margin: 2px 0px;
+        }
+        .badge-status-delta-text{
+            font-size: 9pt !important;
+        }
+    }
+}
+
 .chart-zone-indicator {
     height: 14px;
     font-size: 6pt;
@@ -198,6 +249,7 @@ div#statePieChartContainer .badge-status-delta {
     margin: 2px;
     height: 30px;
     font-size: 12px;
+    width: 52px;
 
     i{
         font-size: 10pt;
@@ -212,7 +264,8 @@ div#statePieChartContainer .badge-status-delta {
     }
 }
 .sort-by-dropdown{
-    top: 4px;
+    margin: 15px 0px;
+    text-align: center;
 
     & button {
         height: 30px;
@@ -290,6 +343,11 @@ a#dropdownMenuButton {
 }
 #districtsHeader {
     margin: 7px 20px;
+
+    .sort-by-dropdown {
+        margin: 0px;
+        float: right;
+    }
 }
 .col-centered{
     display: block;

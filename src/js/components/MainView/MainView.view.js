@@ -11,6 +11,8 @@ import StatesData from '../../data/States.json';
 import CountryData from '../../Models/CountryData.model';
 import StatesDaily from '../../Models/StatesDaily.model';
 import BadgeBarView from '../BadgeBar/BadgeBar.view';
+import ZoneRestrictionsView from '../ZoneRestrictions/ZoneRestrictions.view';
+import CriteriaDropDownView from '../CriteriaDropDown/CriteriaDropDown.view';
 
 export default Marionette.View.extend({
     template: mainTemplate,
@@ -25,6 +27,8 @@ export default Marionette.View.extend({
         stateLineChartRegion: '#stateLineChartContainer',
         districtPieChartRegion: '#districtChartsContainer',
         topDistrictPieChartRegion: '#topDistrictChartsContainer',
+        zoneRestrictionsRegion: '#zoneRestrictionsContainer',
+        stateListPieChartRegion: '#stateListPieChartContainer',
     },
     initialize: function () {
         this.defaultSelections = {
@@ -33,8 +37,6 @@ export default Marionette.View.extend({
             sortByOrderDescending: false
         };
         this.stateSelected = this.defaultSelections.stateSelected;
-        this.sortBySelected = this.defaultSelections.sortBySelected;
-        this.sortByOrderDescending = this.defaultSelections.sortByOrderDescending;
 
         const defaults = {
             deaths: '',
@@ -46,6 +48,12 @@ export default Marionette.View.extend({
         Backbone.Radio.channel('user').on('changeState', this.changeStateSelection.bind(this));
     },
     onRender: function () {
+        this.hideAllTabContainers();
+
+        this.showChildView('districtPieChartRegion', new PieChartCollectionView({ id: this.stateSelected }));
+        this.showChildView('stateListPieChartRegion', new PieChartCollectionView({ id: 'India' }));
+        this.showChildView('zoneRestrictionsRegion', new ZoneRestrictionsView());
+
         const $ddMenu = this.$el.find('#stateSelectionDropdown > .dropdown-menu');
         Object.keys(StatesData).forEach((state) => {
             $ddMenu.append($('<a/>', {
@@ -53,170 +61,221 @@ export default Marionette.View.extend({
                 'href': '#'
             }).html(state));
         });
-        this.getAllDistrictsData().then((allDistrictData) => {
-            let stateInsights = {};
-            Object.keys(allDistrictData).forEach(key => {
-                const state = allDistrictData[key];
-                const insight = {
-                    code: state.statecode,
-                    totalDistricts: Object.keys(state.districtData).length,
-                    active: Object.values(state.districtData).reduce((total, obj) => { return total + obj.active }, 0),
-                    confirmed: Object.values(state.districtData).reduce((total, obj) => { return total + obj.confirmed }, 0),
-                    deceased: Object.values(state.districtData).reduce((total, obj) => { return total + obj.deceased }, 0),
-                    recovered: Object.values(state.districtData).reduce((total, obj) => { return total + obj.recovered }, 0),
-                    delta: {
-                        confirmed: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.confirmed }, 0),
-                        deceased: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.deceased }, 0),
-                        recovered: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.recovered }, 0),
-                    }
-                };
-                stateInsights[key] = insight;
-            });
-            //console.dir(stateInsights);
-        }).then(this.loadChildViews.bind(this))
+        this.getAllDistrictsData().then(this.getStateInsights.bind(this)).then((statewiseData) => {
+            this.showCountryBarChart(statewiseData);
+            return {
+                active: Object.values(statewiseData).reduce((total, obj) => { return total + obj.active }, 0),
+                confirmed: Object.values(statewiseData).reduce((total, obj) => { return total + obj.confirmed }, 0),
+                deceased: Object.values(statewiseData).reduce((total, obj) => { return total + obj.deceased }, 0),
+                recovered: Object.values(statewiseData).reduce((total, obj) => { return total + obj.recovered }, 0),
+                delta: {
+                    confirmed: Object.values(statewiseData).reduce((total, obj) => { return total + obj.delta.confirmed }, 0),
+                    deceased: Object.values(statewiseData).reduce((total, obj) => { return total + obj.delta.deceased }, 0),
+                    recovered: Object.values(statewiseData).reduce((total, obj) => { return total + obj.delta.recovered }, 0),
+                }
+            }
+        })
             .then(this.showCountryPieChart.bind(this))
-            .then(this.showCountryBarChart.bind(this));
+            .then(() => {
+                let $mainContainer = this.getChildView('stateListPieChartRegion').$el.parent();
+                if (!$mainContainer.find('#stateListCriteriaDropDown').is(':visible')) {
+                    $mainContainer.prepend(new CriteriaDropDownView({
+                        id: 'stateListCriteriaDropDown',
+                        label: 'Criteria',
+                        defaultSortByOption: this.defaultSelections.sortBySelected,
+                        sortOrderDisabled: false,
+                        callback: (changedSortBy, changedSortOrder) => {
+                            console.log('selection changed:' + changedSortBy);
+                            this.getStateList(changedSortBy, changedSortOrder);
+                        },
+                    }).render().el);
+                }
+                this.getStateList(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
+            });
+    },
+    getStateInsights: function (allDistrictData) {
+        let stateInsights = {};
+        Object.keys(allDistrictData).forEach(key => {
+            const state = allDistrictData[key];
+            const insight = {
+                loc: key,
+                totalDistricts: Object.keys(state.districtData).length,
+                active: Object.values(state.districtData).reduce((total, obj) => { return total + obj.active }, 0),
+                confirmed: Object.values(state.districtData).reduce((total, obj) => { return total + obj.confirmed }, 0),
+                deceased: Object.values(state.districtData).reduce((total, obj) => { return total + obj.deceased }, 0),
+                recovered: Object.values(state.districtData).reduce((total, obj) => { return total + obj.recovered }, 0),
+                delta: {
+                    confirmed: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.confirmed }, 0),
+                    deceased: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.deceased }, 0),
+                    recovered: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.recovered }, 0),
+                },
+                zones: {
+                    Red: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Red' ? 1 : 0)}, 0),
+                    Orange: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Orange' ? 1 : 0)}, 0),
+                    Green: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Green' ? 1 : 0)}, 0),
+                }
+            };
+            stateInsights[key] = insight;
+        });
+        return stateInsights;
     },
     events: {
         'click #stateSelectionDropdown a.dropdown-item': 'onStateSelectionChange',
         'click #sortByDropdown a.dropdown-item': 'onSortBySelectionChange',
-        'click #topDistrictSortByDropdown a.dropdown-item': 'onTopDistrictsCriteriaChange',
         'click #sortOrderBtn': 'onSortOrderSelectionChange',
-        'click #topDistrictsBtn': 'showTopDistricts'
+        'click #topDistrictsBtn': 'showTopDistricts',
+        'click #getStatesBtn': 'onStateListNavBtnClick'
     },
-    onTopDistrictsCriteriaChange: function (e) {
+    onStateListNavBtnClick: function (e) {
         e.preventDefault();
-        this.sortBySelected = $(e.target).html();
-        this.getTopDistricts($(e.target).html(), this.defaultSelections.sortByOrderDescending);
+        this.getStateList(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
+    },
+    getStateList: function (sortByOption, sortOrderDesc) {
+        this.getAllDistrictsData()
+            .then(this.getStateInsights.bind(this))
+            .then((insights) => {
+                return this.prepareStateData(insights, sortByOption, sortOrderDesc);
+            })
+            .then((statewiseData) => {
+                this.hideAllTabContainers();
+                this.$el.find('#stateListPieChartContainer').show();
+                this.$el.find('#getStatesBtn').addClass('active');
+                this.getChildView('stateListPieChartRegion').collection.reset(statewiseData);
+            });
+
     },
     showTopDistricts: function (e) {
         e.preventDefault();
-        this.$el.find('#stateContentMain').hide();
         this.getTopDistricts(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
     },
     onStateSelectionChange: function (e) {
         e.preventDefault();
         this.changeStateSelection($(e.target).html());
     },
-    onSortBySelectionChange: function (e) {
-        e.preventDefault();
-        this.sortBySelected = $(e.target).html();
-        this.getStateDistricts();
-    },
-    onSortOrderSelectionChange: function (e) {
-        e.preventDefault();
-        this.sortByOrderDescending = !this.sortByOrderDescending;
-        this.getStateDistricts();
+    hideAllTabContainers: function () {
+        /*this.getChildView('zoneRestrictionsRegion').el.hide();
+        this.$el.find('#stateChartsMainContainer').hide();
+        this.$el.find('#topDistrictMainContainer').hide();
+        this.$el.find('#topDistrictMainContainer').hide();*/
+        $('.tab-item-container').hide();
+        $('#selectionNavBar').find('a').removeClass('active');
     },
     changeStateSelection: function (state) {
         if (state == "Telengana") state = "Telangana";
         this.stateSelected = state;
-        this.sortBySelected = this.defaultSelections.sortBySelected;
-        this.sortByOrderDescending = this.defaultSelections.sortByOrderDescending;
         this.$el.find('#dropdownMenuButton').html(this.stateSelected);
         //this.resetChildViews();
-        this.loadChildViews();
+        this.loadStateCharts();
     },
     resetChildViews: function () {
         this.getChildView('districtPieChartRegion').destroy();
         this.getChildView('statePieChartRegion').destroy();
         this.getChildView('stateLineChartRegion').destroy();
     },
-    loadChildViews: function () {
-        this.$el.find('#stateContentMain').show();
-        this.$el.find('#topDistrictContainer').hide();
-        this.$el.find('#topDistrictsBtn').removeClass('active');
+    loadStateCharts: function () {
+        this.hideAllTabContainers();
+        const $mainContainer = this.$el.find('#stateChartsMainContainer');
+        $mainContainer.show();
         this.$el.find('#dropdownMenuButton').addClass('active');
 
-        this.showChildView('districtPieChartRegion', new PieChartCollectionView({ id: this.stateSelected }));
-        this.getStateDistricts().then(districts => {
-            const data = {
-                totalConfirmed: districts.reduce(function (tot, arr) { return tot + arr.district.confirmed; }, 0),
-                deaths: districts.reduce(function (tot, arr) { return tot + arr.district.deceased; }, 0),
-                discharged: districts.reduce(function (tot, arr) { return tot + arr.district.recovered; }, 0),
-                delta: {
-                    confirmed: districts.reduce(function (tot, arr) { return tot + arr.district.delta.confirmed; }, 0),
-                    deceased: districts.reduce(function (tot, arr) { return tot + arr.district.delta.deceased; }, 0),
-                    recovered: districts.reduce(function (tot, arr) { return tot + arr.district.delta.recovered; }, 0),
-                }
-            }
-            const district = {
-                confirmed: data.totalConfirmed,
-                active: data.totalConfirmed - data.deaths - data.discharged,
-                deceased: data.deaths,
-                recovered: data.discharged,
-                delta: data.delta
-            };
-            const statePieStart = new PieChart({
-                id: 'pieChartContainer',
-                "className": 'pie-chart',
-                district,
-                options: {
-                    title: {
-                        display: false,
-                        customTitle: false,
-                        text: this.stateSelected,
-                        fontSize: 20
-                    },
-                    legend: {
-                        display: false
-                    },
-                    hideBadgeBar: true
+        if (!this.$el.find('#stateDistrictsCriteriaDropDown').is(':visible')) {
+            $mainContainer.find('.sortby-dropdown').append(new CriteriaDropDownView({
+                id: 'stateDistrictsCriteriaDropDown',
+                label: 'Sort By',
+                defaultSortByOption: this.defaultSelections.sortBySelected,
+                sortOrderDisabled: false,
+                callback: (changedSortBy, changedSortOrder) => {
+                    console.log('selection changed:' + changedSortBy);
+                    this.loadStateDistrictCharts(changedSortBy, changedSortOrder);
                 },
+            }).render().el);
+        }
+        this.loadStateDistrictCharts()
+            .then(this.showStatePieStart.bind(this))
+            .then(this.prepareStateLineChartData.bind(this))
+            .then(this.drawStateLineChart.bind(this))
+            .catch((err) => {
+                localStorage.removeItem(this.stateSelected + "_districtHistory");
+                localStorage.removeItem('allDistrictsLatest');
             });
-            this.$el.find('#statePieChartName').html(this.stateSelected);
-            this.showChildView('stateStatusBadgesRegion', new BadgeBarView({ district }));
-            this.showChildView('statePieChartRegion', statePieStart);
-        }).then(() => {
-            let loaded = {};
-            let distHistory = localStorage.getItem(this.stateSelected + "_districtHistory");
-            distHistory = distHistory ? JSON.parse(distHistory) : {};
-            if (distHistory && distHistory.result && !this.checkExpired(distHistory.lastUpdated, 24 * 60 * 60 * 1000)) {
-                loaded = Promise.resolve(distHistory.result);
-            } else {
-                loaded = new StateData({ type: 'history', stateName: this.stateSelected }).fetch().then((result) => {
-                    localStorage.setItem(this.stateSelected + "_districtHistory", JSON.stringify({
-                        result: result,
-                        lastUpdated: new Date()
-                    }));
-                    return result;
-                });
-            }
-            return loaded.then(this.drawStateLineChart.bind(this));
-        }).catch((err) => {
-            localStorage.removeItem(this.stateSelected + "_districtHistory");
-            localStorage.removeItem('allDistrictsLatest');
-        });
     },
-    showCountryPieChart: function () {
-        let latestCountry = new CountryData({ type: 'latest' });
-        return latestCountry.fetch().then((result) => {
-            //console.log(result);
-            const summary = result['unofficial-summary'][0];
-            const countryPieStart = new PieChart({
-                id: 'pieChartContainer',
-                "className": 'country-pie-chart',
-                district: {
-                    confirmed: summary.total,
-                    active: summary.active,
-                    deceased: summary.deaths,
-                    recovered: summary.recovered
-                },
-                options: {
-                    title: {
-                        display: true,
-                        customTitle: false,
-                        text: 'India',
-                        fontSize: 20
-                    },
-                    legend: {
-                        display: false
-                    }
-                },
+    loadStateDistrictCharts: function (sortBySelected, sortByOrderDescending) {
+        let stateName = this.stateSelected;
+        sortBySelected = sortBySelected || this.defaultSelections.sortBySelected;
+        sortByOrderDescending = sortByOrderDescending || this.defaultSelections.sortByOrderDescending;
+
+        return this.getAllDistrictsData().then(allDistrictData => {
+            let districtData = allDistrictData[stateName].districtData;
+            return { districtData, showStateName: false };
+        }).then(this.prepareDistrictData.bind(this))
+            .then(({ districts, stateZoneStats }) => {
+                districts = this.sortDistricts(districts, sortBySelected, sortByOrderDescending);
+                this.getChildView('districtPieChartRegion').collection.reset(districts);
+                Object.keys(stateZoneStats).forEach((key) => {
+                    const $badge = this.$el.find('.zone-badge-' + key);
+                    $badge.html(stateZoneStats[key]);
+                });
+                return districts;
             });
-            this.showChildView('countryPieChartRegion', countryPieStart);
-            return result;
+    },
+    showStatePieStart: function (districts) {
+        const data = {
+            totalConfirmed: districts.reduce(function (tot, arr) { return tot + arr.district.confirmed; }, 0),
+            deaths: districts.reduce(function (tot, arr) { return tot + arr.district.deceased; }, 0),
+            discharged: districts.reduce(function (tot, arr) { return tot + arr.district.recovered; }, 0),
+            delta: {
+                confirmed: districts.reduce(function (tot, arr) { return tot + arr.district.delta.confirmed; }, 0),
+                deceased: districts.reduce(function (tot, arr) { return tot + arr.district.delta.deceased; }, 0),
+                recovered: districts.reduce(function (tot, arr) { return tot + arr.district.delta.recovered; }, 0),
+            }
+        }
+        const district = {
+            confirmed: data.totalConfirmed,
+            active: data.totalConfirmed - data.deaths - data.discharged,
+            deceased: data.deaths,
+            recovered: data.discharged,
+            delta: data.delta
+        };
+        const statePieStart = new PieChart({
+            id: 'pieChartContainer',
+            "className": 'pie-chart',
+            district,
+            options: {
+                title: {
+                    display: false,
+                    customTitle: false,
+                    text: this.stateSelected,
+                    fontSize: 20
+                },
+                legend: {
+                    display: false
+                },
+                hideBadgeBar: true
+            },
         });
+        this.$el.find('#statePieChartName').html(this.stateSelected);
+        this.showChildView('stateStatusBadgesRegion', new BadgeBarView({ district }));
+        this.showChildView('statePieChartRegion', statePieStart);
+    },
+    showCountryPieChart: function (result) {
+        const countryPieStart = new PieChart({
+            id: 'pieChartContainer',
+            "className": 'country-pie-chart',
+            district: result,
+            options: {
+                title: {
+                    display: true,
+                    customTitle: false,
+                    text: 'India',
+                    fontSize: 20
+                },
+                legend: {
+                    display: false
+                }
+            },
+        });
+        this.showChildView('countryPieChartRegion', countryPieStart);
+        return result;
     },
     showCountryLineChart: function () {
         let statesDaily = new StatesDaily();
@@ -254,14 +313,14 @@ export default Marionette.View.extend({
         });
     },
     showCountryBarChart: function (result) {
-        result = result.regional;
-        //console.log(result);
-        result.sort((a, b) => { return b.totalConfirmed - a.totalConfirmed });
+        result = Object.keys(result).sort((a, b) => {
+            return result[b].confirmed - result[a].confirmed
+        }).map(key => result[key]);
         result = result.splice(0, 10);
         const data = {
             datasets: [{
                 label: "Recovered",
-                data: result.map(a => a.discharged),
+                data: result.map(a => a.recovered),
                 backgroundColor: 'rgba(60, 174, 163, 0.8)',
                 hoverBackgroundColor: 'rgba(60, 174, 163, 1)',
                 datalabels: {
@@ -270,7 +329,7 @@ export default Marionette.View.extend({
                 }
             }, {
                 label: "Deaths",
-                data: result.map(a => a.deaths),
+                data: result.map(a => a.deceased),
                 backgroundColor: 'rgba(237, 85, 59, 0.8)',
                 hoverBackgroundColor: 'rgba(237, 85, 59, 1)',
                 datalabels: {
@@ -279,7 +338,7 @@ export default Marionette.View.extend({
                 }
             }, {
                 label: "Active",
-                data: result.map(a => a.totalConfirmed - a.discharged - a.deaths),
+                data: result.map(a => a.confirmed - a.recovered - a.deceased),
                 backgroundColor: 'rgba(32, 99, 155, 0.8)',
                 hoverBackgroundColor: 'rgba(32, 99, 155, 1)',
                 datalabels: {
@@ -300,6 +359,24 @@ export default Marionette.View.extend({
             }
         });
         this.showChildView('countryLineChartRegion', countryBarChart);
+        return result;
+    },
+    prepareStateLineChartData: function () {
+        let loaded = {};
+        let distHistory = localStorage.getItem(this.stateSelected + "_districtHistory");
+        distHistory = distHistory ? JSON.parse(distHistory) : {};
+        if (distHistory && distHistory.result && !this.checkExpired(distHistory.lastUpdated, 24 * 60 * 60 * 1000)) {
+            loaded = Promise.resolve(distHistory.result);
+        } else {
+            loaded = new StateData({ type: 'history', stateName: this.stateSelected }).fetch().then((result) => {
+                localStorage.setItem(this.stateSelected + "_districtHistory", JSON.stringify({
+                    result: result,
+                    lastUpdated: new Date()
+                }));
+                return result;
+            });
+        }
+        return loaded;
     },
     drawStateLineChart: function (result) {
         let timeline = result.map(a => a.day);
@@ -372,13 +449,29 @@ export default Marionette.View.extend({
         }
         return loaded;
     },
-    getTopDistricts: function (criteria, orderDesc) {
-        this.$el.find('#stateContentMain').hide();
-        this.$el.find('#topDistrictContainer').show();
+    getTopDistricts: function () {
+        this.hideAllTabContainers();
+        const $mainContainer = this.$el.find('#topDistrictMainContainer');
+        $mainContainer.show();
         this.$el.find('#topDistrictsBtn').addClass('active');
-        this.$el.find('#dropdownMenuButton').removeClass('active');
 
-        this.showChildView('topDistrictPieChartRegion', new PieChartCollectionView({ id: 'topDistricts' }));
+        if (!this.$el.find('#topDistrictsCriteriaDropDown').is(':visible')) {
+            $mainContainer.prepend(new CriteriaDropDownView({
+                id: 'topDistrictsCriteriaDropDown',
+                label: 'Criteria',
+                defaultSortByOption: this.defaultSelections.sortBySelected,
+                sortOrderDisabled: true,
+                callback: (changedSortBy, changedSortOrder) => {
+                    console.log('selection changed:' + changedSortBy);
+                    this.renderTopDistricts(changedSortBy, changedSortOrder);
+                },
+            }).render().el);
+            this.showChildView('topDistrictPieChartRegion', new PieChartCollectionView({ id: 'topDistricts' }));
+        }
+
+        return this.renderTopDistricts(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
+    },
+    renderTopDistricts: function (criteria, orderDesc) {
         return this.getAllDistrictsData().then(allDistrictData => {
             let allDistricts = [], result = {};
             Object.keys(allDistrictData).forEach((stateName) => {
@@ -393,32 +486,15 @@ export default Marionette.View.extend({
             allDistricts = this.sortDistricts(allDistricts, criteria, orderDesc);
             allDistricts = allDistricts.splice(0, 10);
             allDistricts.forEach(dist => { result[dist.name] = dist });
-            return { districtData: result, showStateName: true }
+            return { districtData: result, showStateName: true };
         }).then(this.prepareDistrictData.bind(this)).then(({ districts, stateZoneStats }) => {
             this.getChildView('topDistrictPieChartRegion').collection.reset(districts);
-            this.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
-            return districts;
-        });
-    },
-    getStateDistricts: function () {
-        let stateName = this.stateSelected;
-        return this.getAllDistrictsData().then(allDistrictData => {
-            return allDistrictData[stateName];
-        }).then(this.prepareDistrictData.bind(this)).then(({ districts, stateZoneStats }) => {
-            this.getChildView('districtPieChartRegion').collection.reset(districts);
-            Object.keys(stateZoneStats).forEach((key) => {
-                const $badge = this.$el.find('.zone-badge-' + key);
-                $badge.html(stateZoneStats[key]);
-            });
-            this.$el.find('#sortByDropdown > button').html('Sort by: ' + this.sortBySelected);
-            this.$el.find('#sortOrderBtn > i.arrow').html("arrow_" + (this.sortByOrderDescending ? 'upward' : 'downward'));
+            //this.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
             return districts;
         });
     },
     prepareDistrictData: function (result) {
-        let stateName = this.stateSelected, sortBy = this.sortBySelected, sortByOrderDescending = this.sortByOrderDescending;
         return new Promise((resolve, rej) => {
-            //console.log(result);
             let districts = [], stateZoneStats = {
                 Red: 0,
                 Orange: 0,
@@ -426,7 +502,7 @@ export default Marionette.View.extend({
             };
             Object.keys(result.districtData).forEach((key) => {
                 const district = result.districtData[key];
-                const containerID = stateName.split(' ').join('-') + "_" + key.split(' ').join('-').split('.').join('-') + '_pieChart';
+                const containerID = (district.state ? district.state.split(' ').join('-') + "_" : '') + key.split(' ').join('-').split('.').join('-') + '_pieChart';
                 districts.push({
                     id: containerID,
                     title: key,
@@ -446,8 +522,36 @@ export default Marionette.View.extend({
                 });
                 if (district.zone) stateZoneStats[district.zone.zone]++;
             });
-            districts = this.sortDistricts(districts, sortBy, sortByOrderDescending);
             resolve({ districts, stateZoneStats });
+        });
+    },
+    prepareStateData: function (result, sortBySelected, sortByOrderDescending) {
+        return new Promise((resolve, rej) => {
+            //console.log(result);
+            let stateList = [];
+            Object.keys(result).forEach((key) => {
+                const state = result[key];
+                const containerID = key.split(' ').join('-') + '_pieChart';
+                stateList.push({
+                    id: containerID,
+                    title: key,
+                    "className": 'district-pie-chart state-district-pie-chart',
+                    district: state,
+                    options: {
+                        title: {
+                            display: false,
+                            customTitle: true,
+                            text: key,
+                            fontSize: 17
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                });
+            });
+            stateList = this.sortDistricts(stateList, sortBySelected, sortByOrderDescending);
+            resolve(stateList);
         });
     },
     sortDistricts: function (districts, sortBy, sortByOrderDescending) {

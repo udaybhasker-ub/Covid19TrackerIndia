@@ -38,6 +38,13 @@ export default Marionette.View.extend({
             //if (difference > 0) difference = '+' + difference;
             $zoneIndecator.html('Zone updated ' + difference + ' days ago');
         }
+        if (district.zones) {
+            this.$el.find('.chart-zone-indicator').hide();
+            const $container = this.$el.find('.pie-chart-zone-badges').show();
+            Object.keys(district.zones).forEach(key => {
+                $container.find('.zone-badge-'+key).html(district.zones[key]);
+            });
+        } else this.$el.find('.pie-chart-zone-badges').hide();
     },
     getDateDiffInDays: function (a, b) {
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;

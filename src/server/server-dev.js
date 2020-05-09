@@ -5,7 +5,9 @@ import https from 'https'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import config from '../../webpack.dev.config.js'
-import testLatest from './TESTDATA/latest.json'
+import cron from 'node-cron'
+import fs from 'fs'
+
 
 const app = express(),
     DIST_DIR = __dirname,
@@ -28,7 +30,7 @@ app.get('/covid', (req, res, next) => {
 
 const request = (path, options, callback) => {
     app.get(path, (req, resp, next) => {
-        console.log(new Date() + ' - Request:' + req.url + ' from '+req.connection.remoteAddress);
+        console.log(new Date() + ' - Request:' + req.url + ' from ' + req.connection.remoteAddress);
         https.get(options, (res) => {
             var json = '';
 
@@ -143,6 +145,38 @@ request('/latest/:stateName/districtZones', {
     resp.set('content-type', 'application/json')
     resp.send(data);
     resp.end();
+});
+
+cron.schedule("59 23 * * *", function () {
+    console.log("---------------------");
+    console.log("Saving latest distric data into a file");
+    https.get({
+        host: 'api.covid19india.org',
+        path: 'state_district_wise.json',
+        method: 'GET'
+    }, (res) => {
+        var json = '';
+        res.on('data', function (chunk) {
+            json += chunk;
+        });
+        res.on('end', () => {
+            if (res.statusCode === 200) {
+                try {
+                    const fname = new Date().getTime() + '_all_district.json';
+                    fs.writeFile(path.join(__dirname, '../dailydata/', fname), json, (err) => {
+                        if (err) throw err;
+                        console.log('Data written to file:' + fname);
+                    });
+                } catch (e) {
+                    console.log('Error parsing JSON!', e);
+                }
+            } else {
+                console.log('Status:', res.statusCode);
+            }
+        });
+    }).on('error', function (err) {
+        console.log('Error:', err);
+    });
 });
 
 const PORT = process.env.PORT || 8000

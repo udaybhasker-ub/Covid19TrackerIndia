@@ -1,5 +1,11 @@
 <div class="chart-zone-indicator"></div>
- <div class="pie-chart-title" style="<%=(!options.title.display && options.title.customTitle) ? '' : 'display:none'%>"><%=options.title.text%></div>
+<div class="pie-chart-title col-xs-8" style="<%=(!options.title.display && options.title.customTitle) ? '' : 'display:none'%>">
+    <%=options.title.text%></div>
+<div class="pie-chart-zone-badges district-badge-items col-xs-4">
+    <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>
+    <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>
+    <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>
+</div>
 <div class="pie-chart-inner-container">
     <div class="pie-chart-canvas-container col-md-6">
         <canvas id="<%=id%>_canvas"></canvas>

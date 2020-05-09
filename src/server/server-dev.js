@@ -7,6 +7,7 @@ import webpackHotMiddleware from 'webpack-hot-middleware'
 import config from '../../webpack.dev.config.js'
 import cron from 'node-cron'
 import fs from 'fs'
+import AWS from 'aws-sdk'
 
 
 const app = express(),
@@ -147,6 +148,19 @@ request('/latest/:stateName/districtZones', {
     resp.end();
 });
 
+var credentials = new AWS.Credentials({
+    accessKeyId: 'AKIA44KQIEO4XA7DP7MB', secretAccessKey: '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'
+});
+AWS.config.update({ region: 'ap-south-1', credentials });
+const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+s3.listBuckets(function (err, data) {
+    if (err) {
+        console.log("Error", err);
+    } else {
+        console.log("Success", data.Buckets);
+    }
+});
+
 cron.schedule("59 23 * * *", function () {
     console.log("---------------------");
     console.log("Saving latest distric data into a file");
@@ -162,10 +176,17 @@ cron.schedule("59 23 * * *", function () {
         res.on('end', () => {
             if (res.statusCode === 200) {
                 try {
-                    const fname = new Date().getTime() + '_all_district.json';
-                    fs.writeFile(path.join(__dirname, '../dailydata/', fname), json, (err) => {
-                        if (err) throw err;
-                        console.log('Data written to file:' + fname);
+                    var uploadParams = { Bucket: 'covid19india-data-daily', Key: '', Body: '' };
+                    var file = new Date().getTime() + '_latest_all_districts.json';
+                    uploadParams.Body = json;
+                    uploadParams.Key = path.basename(file);
+
+                    s3.upload(uploadParams, function (err, data) {
+                        if (err) {
+                            console.log("Error", err);
+                        } if (data) {
+                            console.log("Upload Success", data.Location);
+                        }
                     });
                 } catch (e) {
                     console.log('Error parsing JSON!', e);

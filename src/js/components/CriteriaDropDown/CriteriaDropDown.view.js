@@ -1,5 +1,5 @@
 import Marionette from 'backbone.marionette';
-import CriteriaDropdownTemplate from './CriteriaDropdown.view.jst';
+import CriteriaDropdownTemplate from './CriteriaDropDown.view.jst';
 
 export default Marionette.View.extend({
     template: CriteriaDropdownTemplate,

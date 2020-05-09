@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "49fcd4288fec3a336268";
+/******/ 	var hotCurrentHash = "9eb266ba1c4a46dec26d";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -67971,12 +67971,12 @@ return __p;
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var backbone_marionette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! backbone.marionette */ "./node_modules/backbone.marionette/lib/backbone.marionette.js");
 /* harmony import */ var backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(backbone_marionette__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _CriteriaDropdown_view_jst__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CriteriaDropdown.view.jst */ "./src/js/components/CriteriaDropDown/CriteriaDropdown.view.jst");
-/* harmony import */ var _CriteriaDropdown_view_jst__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_CriteriaDropdown_view_jst__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _CriteriaDropDown_view_jst__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CriteriaDropDown.view.jst */ "./src/js/components/CriteriaDropDown/CriteriaDropDown.view.jst");
+/* harmony import */ var _CriteriaDropDown_view_jst__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_CriteriaDropDown_view_jst__WEBPACK_IMPORTED_MODULE_1__);
 
 
 /* harmony default export */ __webpack_exports__["default"] = (backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default.a.View.extend({
-  template: _CriteriaDropdown_view_jst__WEBPACK_IMPORTED_MODULE_1___default.a,
+  template: _CriteriaDropDown_view_jst__WEBPACK_IMPORTED_MODULE_1___default.a,
   tagName: 'div',
   className: 'dropdown sort-by-dropdown',
   id: function id() {
@@ -68037,9 +68037,9 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/js/components/CriteriaDropDown/CriteriaDropdown.view.jst":
+/***/ "./src/js/components/CriteriaDropDown/CriteriaDropDown.view.jst":
 /*!**********************************************************************!*\
-  !*** ./src/js/components/CriteriaDropDown/CriteriaDropdown.view.jst ***!
+  !*** ./src/js/components/CriteriaDropDown/CriteriaDropDown.view.jst ***!
   \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {

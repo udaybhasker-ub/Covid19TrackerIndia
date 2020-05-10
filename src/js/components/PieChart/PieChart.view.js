@@ -18,7 +18,12 @@ export default Marionette.View.extend({
         this.className = this.model.get('className');
     },
     events: {
-        'click button#getDistrictsBtn': 'getDistricts'
+        'click button#getDistrictsBtn': 'getDistricts',
+        'click': 'onContainerClick'
+    },
+    onContainerClick: function () {
+        const cb = this.model.get('options').onClick;
+        if (cb) this.model.get('options').onClick(this.model.get('district').loc);
     },
     onRender: function () {
         this.loadPieChart();
@@ -42,9 +47,14 @@ export default Marionette.View.extend({
             this.$el.find('.chart-zone-indicator').hide();
             const $container = this.$el.find('.pie-chart-zone-badges').show();
             Object.keys(district.zones).forEach(key => {
-                $container.find('.zone-badge-'+key).html(district.zones[key]);
+                $container.find('.zone-badge-' + key).html(district.zones[key]);
             });
         } else this.$el.find('.pie-chart-zone-badges').hide();
+
+        if (district.stats && district.stats.doublingRate) {
+            this.$el.find('.badge-dblrate-main').find('.dblrate-text').html("Doubling Rate");
+            this.$el.find('.badge-dblrate-main').find('.badge-dblrate').html(district.stats.doublingRate.toFixed(2) + " days");
+        } else this.$el.find('.badge-dblrate-container').hide();
     },
     getDateDiffInDays: function (a, b) {
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;

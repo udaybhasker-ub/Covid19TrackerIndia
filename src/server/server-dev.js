@@ -148,11 +148,81 @@ request('/latest/:stateName/districtZones', {
     resp.end();
 });
 
-var credentials = new AWS.Credentials({
-    accessKeyId: 'AKIA44KQIEO4XA7DP7MB', secretAccessKey: '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'
+let getDoublingRate = (data, region) => {
+    let result = {};
+    let lastSevenDaysData = data.filter((day) => {
+        const timeDiff = new Date().getTime() - new Date(day.day).getTime();
+        return timeDiff <= (8 * 24 * 60 * 60 * 1000);
+    });
+    let doublingRate = 0;
+    try {
+        let totalPercentageIncrease = 0;
+        for (let i = lastSevenDaysData.length - 1; i > 0; i--) {
+            let increasePercentage;
+            if (region == 'India') {
+                increasePercentage = ((lastSevenDaysData[i].summary.total - lastSevenDaysData[i - 1].summary.total) / lastSevenDaysData[i - 1].summary.total) * 100;
+            } else {
+                const reg = lastSevenDaysData[i].regional.filter(r => r.loc === region)[0],
+                    regDayBefore = lastSevenDaysData[i - 1].regional.filter(r => r.loc === region)[0];
+                increasePercentage = ((reg.totalConfirmed - regDayBefore.totalConfirmed) / regDayBefore.totalConfirmed) * 100;
+            }
+            totalPercentageIncrease += increasePercentage;
+        }
+        const avgPercetageIncrease = totalPercentageIncrease / (lastSevenDaysData.length - 1);
+        //console.log(region + ":" + avgPercetageIncrease);
+        doublingRate = (avgPercetageIncrease > 0.0) ? (70 / avgPercetageIncrease) : 0;
+    } catch (err) {
+        //console.error(err);
+        result.errorMessage = "No sufficient data";
+    }
+
+    result.region = region;
+    result.doublingRate = doublingRate;
+    //console.log(result);
+    return result;
+};
+
+request('/latest/all/doublingrate', {
+    host: 'api.rootnet.in',
+    path: '/covid19-in/stats/history',
+    method: 'GET'
+}, (req, resp, json) => {
+    let data = JSON.parse(json), result = {}, stateList = [];
+    if (!data.success) throw Error('Response failed!');
+    data = data.data;
+    data.forEach((day) => {
+        const states = day.regional.map(r => r.loc);
+        stateList.push({
+            states,
+            count: states.length
+        });
+    });
+    let maxCount = 0, maxobj;
+    stateList.forEach(s => { if (s.count > maxCount) maxobj = s });
+    stateList = maxobj.states;
+    stateList.push("India");
+    stateList.forEach(r => {
+        result[(r == 'Telengana' ? 'Telangana' : r)] = getDoublingRate(data, r);
+    });
+
+    resp.set('content-type', 'application/json');
+    resp.send(result);
+    resp.end();
 });
-AWS.config.update({ region: 'ap-south-1', credentials });
+
+AWS.config.update({
+    region: 'ap-south-1'
+});
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+
+AWS.config.getCredentials(function (err) {
+    if (err) console.log(err.stack);
+    // credentials not loaded
+    else {
+        console.log("Access key:", AWS.config.credentials.accessKeyId);
+        console.log("Secret access key:", AWS.config.credentials.secretAccessKey);
+    }
+});
 s3.listBuckets(function (err, data) {
     if (err) {
         console.log("Error", err);

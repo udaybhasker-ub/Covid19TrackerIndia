@@ -9,6 +9,12 @@
     <div class="row">
       <div class="col-md-4 align-self-center">
         <div id="countryPieChartContainer"></div>
+        <div id="countryPieChartDblRateContainer" class="badge-dblrate-container">
+          <div class="badge badge-light badge-dblrate-main">
+            <span class="badge dblrate-text"></span>
+            <div class="badge badge-secondary badge-dblrate"></div>
+          </div>
+        </div>
       </div>
       <div class="col-md-8 align-self-center">
         <div id="countryLineChartContainer"></div>
@@ -47,7 +53,15 @@
       <div id="stateStatusBanner" class="row">
         <div id="statePieChartContainer" class="col-md-2"></div>
         <div id="stateLineChartContainer" class="col-md-2 d-none d-lg-block"></div>
-        <div id="statePieChartName" class="col-md-2"></div>
+        <div class="col-md-2">
+          <div id="statePieChartName"></div>
+          <div id="statePieChartDblRateContainer" class="badge-dblrate-container">
+            <div class="badge badge-light badge-dblrate-main">
+              <span class="badge dblrate-text"></span>
+              <div class="badge badge-secondary badge-dblrate"></div>
+            </div>
+          </div>
+        </div>
         <div id="stateStatusBadgesContainer" class="col-md-6"></div>
       </div>
       <div class="row district-wide-graphs-row">
@@ -63,7 +77,7 @@
               <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>
             </div>
             <div class="col-sm-6 sortby-dropdown">
-              
+
             </div>
           </div>
           <div class="border-bottom"></div>

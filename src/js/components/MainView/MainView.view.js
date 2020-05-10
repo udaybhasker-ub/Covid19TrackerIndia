@@ -8,11 +8,11 @@ import BarChart from '../BarChart/BarChart.view';
 import PieChartCollectionView from '../PieChartCollection/PieChartCollection.view';
 import DistrictZoneModel from '../../Models/DistrictZone.model';
 import StatesData from '../../data/States.json';
-import CountryData from '../../Models/CountryData.model';
 import StatesDaily from '../../Models/StatesDaily.model';
 import BadgeBarView from '../BadgeBar/BadgeBar.view';
 import ZoneRestrictionsView from '../ZoneRestrictions/ZoneRestrictions.view';
 import CriteriaDropDownView from '../CriteriaDropDown/CriteriaDropDown.view';
+import DoublingRateModel from '../../Models/DoublingRate.model';
 
 export default Marionette.View.extend({
     template: mainTemplate,
@@ -84,6 +84,7 @@ export default Marionette.View.extend({
                         label: 'Criteria',
                         defaultSortByOption: this.defaultSelections.sortBySelected,
                         sortOrderDisabled: false,
+                        additionalSortOptions: ["Doubling Rate"],
                         callback: (changedSortBy, changedSortOrder) => {
                             console.log('selection changed:' + changedSortBy);
                             this.getStateList(changedSortBy, changedSortOrder);
@@ -94,30 +95,59 @@ export default Marionette.View.extend({
             });
     },
     getStateInsights: function (allDistrictData) {
-        let stateInsights = {};
-        Object.keys(allDistrictData).forEach(key => {
-            const state = allDistrictData[key];
-            const insight = {
-                loc: key,
-                totalDistricts: Object.keys(state.districtData).length,
-                active: Object.values(state.districtData).reduce((total, obj) => { return total + obj.active }, 0),
-                confirmed: Object.values(state.districtData).reduce((total, obj) => { return total + obj.confirmed }, 0),
-                deceased: Object.values(state.districtData).reduce((total, obj) => { return total + obj.deceased }, 0),
-                recovered: Object.values(state.districtData).reduce((total, obj) => { return total + obj.recovered }, 0),
-                delta: {
-                    confirmed: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.confirmed }, 0),
-                    deceased: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.deceased }, 0),
-                    recovered: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.recovered }, 0),
-                },
-                zones: {
-                    Red: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Red' ? 1 : 0)}, 0),
-                    Orange: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Orange' ? 1 : 0)}, 0),
-                    Green: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Green' ? 1 : 0)}, 0),
-                }
-            };
-            stateInsights[key] = insight;
+        return this.getDoublingRates().then((doublingRates) => {
+            let stateInsights = {};
+            Object.keys(allDistrictData).forEach(key => {
+                const state = allDistrictData[key];
+                const insight = {
+                    loc: key,
+                    totalDistricts: Object.keys(state.districtData).length,
+                    active: Object.values(state.districtData).reduce((total, obj) => { return total + obj.active }, 0),
+                    confirmed: Object.values(state.districtData).reduce((total, obj) => { return total + obj.confirmed }, 0),
+                    deceased: Object.values(state.districtData).reduce((total, obj) => { return total + obj.deceased }, 0),
+                    recovered: Object.values(state.districtData).reduce((total, obj) => { return total + obj.recovered }, 0),
+                    delta: {
+                        confirmed: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.confirmed }, 0),
+                        deceased: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.deceased }, 0),
+                        recovered: Object.values(state.districtData).reduce((total, obj) => { return total + obj.delta.recovered }, 0),
+                    },
+                    zones: {
+                        Red: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Red' ? 1 : 0) }, 0),
+                        Orange: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Orange' ? 1 : 0) }, 0),
+                        Green: Object.values(state.districtData).reduce((total, obj) => { return total + (obj.zone && obj.zone.zone == 'Green' ? 1 : 0) }, 0),
+                    }
+                };
+                const doublingRate = doublingRates[key];
+                if (doublingRate && !doublingRate.errorMessage) insight.stats = { doublingRate: doublingRate.doublingRate };
+                stateInsights[key] = insight;
+            });
+
+            this.setCountryDoublingRate(doublingRates['India']);
+            return stateInsights;
         });
-        return stateInsights;
+    },
+    getDoublingRates: function () {
+        let loaded = {};
+        let drHistory = localStorage.getItem("drHistory");
+        drHistory = drHistory ? JSON.parse(drHistory) : {};
+        if (drHistory && drHistory.result && !this.checkExpired(drHistory.lastUpdated, 24 * 60 * 60 * 1000)) {
+            loaded = Promise.resolve(drHistory.result);
+        } else {
+            loaded = new DoublingRateModel().fetch().then((doublingRates) => {
+                localStorage.setItem("drHistory", JSON.stringify({
+                    result: doublingRates,
+                    lastUpdated: new Date()
+                }));
+                return doublingRates;
+            });
+        }
+        return loaded;
+    },
+    setCountryDoublingRate: function (doublingRate) {
+        if (doublingRate && !doublingRate.errorMessage) {
+            this.$el.find('#countryPieChartDblRateContainer').find('.badge-dblrate-main').find('.dblrate-text').html("Doubling Rate");
+            this.$el.find('#countryPieChartDblRateContainer').find('.badge-dblrate-main').find('.badge-dblrate').html(doublingRate.doublingRate.toFixed(2) + " days");
+        } else tthis.$el.find('#countryPieChartDblRateContainer').hide();
     },
     events: {
         'click #stateSelectionDropdown a.dropdown-item': 'onStateSelectionChange',
@@ -190,7 +220,13 @@ export default Marionette.View.extend({
                 },
             }).render().el);
         }
-        this.loadStateDistrictCharts()
+        this.getDoublingRates().then((doublingRates) => {
+            let doublingRate = doublingRates[this.stateSelected];
+            if (doublingRate && doublingRate.doublingRate) {
+                this.$el.find('#statePieChartDblRateContainer .badge-dblrate-main').find('.dblrate-text').html("Doubling Rate");
+                this.$el.find('#statePieChartDblRateContainer .badge-dblrate-main').find('.badge-dblrate').html(doublingRate.doublingRate.toFixed(2) + " days");
+            } else this.$el.find('#statePieChartDblRateContainer .badge-dblrate-container').hide();
+        }).then(this.loadStateDistrictCharts.bind(this))
             .then(this.showStatePieStart.bind(this))
             .then(this.prepareStateLineChartData.bind(this))
             .then(this.drawStateLineChart.bind(this))
@@ -546,6 +582,9 @@ export default Marionette.View.extend({
                         },
                         legend: {
                             display: false
+                        },
+                        onClick: (state) => {
+                            this.changeStateSelection(state);
                         }
                     }
                 });
@@ -586,6 +625,11 @@ export default Marionette.View.extend({
                     flag = b.delta.deceased - a.delta.deceased;
                 }
                 if (!flag) flag = b.deceased - a.deceased;
+            } else if (sortBy == 'Doubling Rate') {
+                if (b.stats && a.stats) {
+                    flag = b.stats.doublingRate - a.stats.doublingRate;
+                }
+                if (!flag) flag = -1;
             } else {
                 flag = b.confirmed - a.confirmed;
             }

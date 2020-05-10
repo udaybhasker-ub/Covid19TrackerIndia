@@ -5,15 +5,15 @@ export default Marionette.View.extend({
     template: CriteriaDropdownTemplate,
     tagName: 'div',
     className: 'dropdown sort-by-dropdown',
-    id: function(){
+    id: function () {
         return this.model.get('id');
     },
     initialize: function (options) {
         this.sortBySelected = options.defaultSortByOption;
         options.defaultSortOrderSelected = false;
         this.sortOrderSelected = options.defaultSortOrderSelected;
-
         this.defaultLabels = ['Confirmed', 'Confirmed - Daily Increase', 'Active', 'Recovered', 'Recovered - Daily Increase', 'Deaths', 'Deaths - Daily Increase', 'Zone'];
+        if (options.additionalSortOptions) this.defaultLabels = [...this.defaultLabels, ...options.additionalSortOptions];
         this.model = new Backbone.Model(options);
     },
     events: {
@@ -24,6 +24,9 @@ export default Marionette.View.extend({
         e.preventDefault();
         this.sortBySelected = $(e.target).html();
         this.sortOrderSelected = this.model.get('defaultSortOrderSelected');
+        if(this.sortBySelected == "Doubling Rate"){
+            this.sortOrderSelected = true;
+        }
         this.updateSortButtons();
         const cb = this.model.get('callback');
         if (cb) cb(this.sortBySelected, this.sortOrderSelected);
@@ -36,7 +39,7 @@ export default Marionette.View.extend({
         if (cb) cb(this.sortBySelected, this.sortOrderSelected);
     },
     onRender: function () {
-        const labels = this.model.get('labels') || this.defaultLabels;
+        const labels = this.defaultLabels;
         labels.forEach(entry => {
             let option = $('<a/>', {
                 'class': 'dropdown-item',
@@ -48,10 +51,10 @@ export default Marionette.View.extend({
         const sortOrderDisabled = this.model.get('sortOrderDisabled');
         if (sortOrderDisabled) {
             this.$el.find('.sort-order-btn').hide();
-        } 
+        }
         this.updateSortButtons();
     },
-    updateSortButtons: function(){
+    updateSortButtons: function () {
         this.$el.find('.sort-by-selection-btn').html(this.model.get('label') + ': ' + this.sortBySelected);
         this.$el.find('.sort-order-btn').find('.arrow').html('arrow_' + (this.sortOrderSelected ? 'upward' : 'downward'));
     }

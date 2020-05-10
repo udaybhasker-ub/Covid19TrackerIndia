@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "9eb266ba1c4a46dec26d";
+/******/ 	var hotCurrentHash = "3da44ff5e42e37ccc5dc";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -67605,29 +67605,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/js/Models/CountryData.model.js":
-/*!********************************************!*\
-  !*** ./src/js/Models/CountryData.model.js ***!
-  \********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var backbone__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! backbone */ "./node_modules/backbone/backbone.js");
-/* harmony import */ var backbone__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(backbone__WEBPACK_IMPORTED_MODULE_0__);
-
-/* harmony default export */ __webpack_exports__["default"] = (backbone__WEBPACK_IMPORTED_MODULE_0___default.a.Model.extend({
-  initialize: function initialize(options) {
-    this.options = options;
-  },
-  url: function url() {
-    return "/" + this.options.type + "/all?tm=" + new Date().getTime();
-  }
-}));
-
-/***/ }),
-
 /***/ "./src/js/Models/DistrictStats.model.js":
 /*!**********************************************!*\
   !*** ./src/js/Models/DistrictStats.model.js ***!
@@ -67669,6 +67646,26 @@ __webpack_require__.r(__webpack_exports__);
   },
   url: function url() {
     return "/latest/" + this.options.stateName + "/districtZones?tm=" + new Date().getTime();
+  }
+}));
+
+/***/ }),
+
+/***/ "./src/js/Models/DoublingRate.model.js":
+/*!*********************************************!*\
+  !*** ./src/js/Models/DoublingRate.model.js ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var backbone__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! backbone */ "./node_modules/backbone/backbone.js");
+/* harmony import */ var backbone__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(backbone__WEBPACK_IMPORTED_MODULE_0__);
+
+/* harmony default export */ __webpack_exports__["default"] = (backbone__WEBPACK_IMPORTED_MODULE_0___default.a.Model.extend({
+  url: function url() {
+    return "/latest/all/doublingrate?tm=" + new Date().getTime();
   }
 }));
 
@@ -68188,11 +68185,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_DistrictZone_model__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../Models/DistrictZone.model */ "./src/js/Models/DistrictZone.model.js");
 /* harmony import */ var _data_States_json__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../data/States.json */ "./src/js/data/States.json");
 var _data_States_json__WEBPACK_IMPORTED_MODULE_9___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../../data/States.json */ "./src/js/data/States.json", 1);
-/* harmony import */ var _Models_CountryData_model__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../Models/CountryData.model */ "./src/js/Models/CountryData.model.js");
-/* harmony import */ var _Models_StatesDaily_model__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../Models/StatesDaily.model */ "./src/js/Models/StatesDaily.model.js");
-/* harmony import */ var _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../BadgeBar/BadgeBar.view */ "./src/js/components/BadgeBar/BadgeBar.view.js");
-/* harmony import */ var _ZoneRestrictions_ZoneRestrictions_view__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../ZoneRestrictions/ZoneRestrictions.view */ "./src/js/components/ZoneRestrictions/ZoneRestrictions.view.js");
-/* harmony import */ var _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../CriteriaDropDown/CriteriaDropDown.view */ "./src/js/components/CriteriaDropDown/CriteriaDropDown.view.js");
+/* harmony import */ var _Models_StatesDaily_model__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../Models/StatesDaily.model */ "./src/js/Models/StatesDaily.model.js");
+/* harmony import */ var _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../BadgeBar/BadgeBar.view */ "./src/js/components/BadgeBar/BadgeBar.view.js");
+/* harmony import */ var _ZoneRestrictions_ZoneRestrictions_view__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../ZoneRestrictions/ZoneRestrictions.view */ "./src/js/components/ZoneRestrictions/ZoneRestrictions.view.js");
+/* harmony import */ var _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../CriteriaDropDown/CriteriaDropDown.view */ "./src/js/components/CriteriaDropDown/CriteriaDropDown.view.js");
+/* harmony import */ var _Models_DoublingRate_model__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../Models/DoublingRate.model */ "./src/js/Models/DoublingRate.model.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -68268,7 +68265,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.showChildView('stateListPieChartRegion', new _PieChartCollection_PieChartCollection_view__WEBPACK_IMPORTED_MODULE_7__["default"]({
       id: 'India'
     }));
-    this.showChildView('zoneRestrictionsRegion', new _ZoneRestrictions_ZoneRestrictions_view__WEBPACK_IMPORTED_MODULE_13__["default"]());
+    this.showChildView('zoneRestrictionsRegion', new _ZoneRestrictions_ZoneRestrictions_view__WEBPACK_IMPORTED_MODULE_12__["default"]());
     var $ddMenu = this.$el.find('#stateSelectionDropdown > .dropdown-menu');
     Object.keys(_data_States_json__WEBPACK_IMPORTED_MODULE_9__).forEach(function (state) {
       $ddMenu.append($('<a/>', {
@@ -68308,7 +68305,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var $mainContainer = _this.getChildView('stateListPieChartRegion').$el.parent();
 
       if (!$mainContainer.find('#stateListCriteriaDropDown').is(':visible')) {
-        $mainContainer.prepend(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_14__["default"]({
+        $mainContainer.prepend(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_13__["default"]({
           id: 'stateListCriteriaDropDown',
           label: 'Criteria',
           defaultSortByOption: _this.defaultSelections.sortBySelected,
@@ -68325,50 +68322,55 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     });
   },
   getStateInsights: function getStateInsights(allDistrictData) {
-    var stateInsights = {};
-    Object.keys(allDistrictData).forEach(function (key) {
-      var state = allDistrictData[key];
-      var insight = {
-        loc: key,
-        totalDistricts: Object.keys(state.districtData).length,
-        active: Object.values(state.districtData).reduce(function (total, obj) {
-          return total + obj.active;
-        }, 0),
-        confirmed: Object.values(state.districtData).reduce(function (total, obj) {
-          return total + obj.confirmed;
-        }, 0),
-        deceased: Object.values(state.districtData).reduce(function (total, obj) {
-          return total + obj.deceased;
-        }, 0),
-        recovered: Object.values(state.districtData).reduce(function (total, obj) {
-          return total + obj.recovered;
-        }, 0),
-        delta: {
+    return new _Models_DoublingRate_model__WEBPACK_IMPORTED_MODULE_14__["default"]().fetch().then(function (doublingRates) {
+      var stateInsights = {};
+      Object.keys(allDistrictData).forEach(function (key) {
+        var state = allDistrictData[key];
+        var insight = {
+          loc: key,
+          totalDistricts: Object.keys(state.districtData).length,
+          active: Object.values(state.districtData).reduce(function (total, obj) {
+            return total + obj.active;
+          }, 0),
           confirmed: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + obj.delta.confirmed;
+            return total + obj.confirmed;
           }, 0),
           deceased: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + obj.delta.deceased;
+            return total + obj.deceased;
           }, 0),
           recovered: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + obj.delta.recovered;
-          }, 0)
-        },
-        zones: {
-          Red: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + (obj.zone && obj.zone.zone == 'Red' ? 1 : 0);
+            return total + obj.recovered;
           }, 0),
-          Orange: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + (obj.zone && obj.zone.zone == 'Orange' ? 1 : 0);
-          }, 0),
-          Green: Object.values(state.districtData).reduce(function (total, obj) {
-            return total + (obj.zone && obj.zone.zone == 'Green' ? 1 : 0);
-          }, 0)
-        }
-      };
-      stateInsights[key] = insight;
+          delta: {
+            confirmed: Object.values(state.districtData).reduce(function (total, obj) {
+              return total + obj.delta.confirmed;
+            }, 0),
+            deceased: Object.values(state.districtData).reduce(function (total, obj) {
+              return total + obj.delta.deceased;
+            }, 0),
+            recovered: Object.values(state.districtData).reduce(function (total, obj) {
+              return total + obj.delta.recovered;
+            }, 0)
+          },
+          zones: {
+            Red: Object.values(state.districtData).reduce(function (total, obj) {
+              return total + (obj.zone && obj.zone.zone == 'Red' ? 1 : 0);
+            }, 0),
+            Orange: Object.values(state.districtData).reduce(function (total, obj) {
+              return total + (obj.zone && obj.zone.zone == 'Orange' ? 1 : 0);
+            }, 0),
+            Green: Object.values(state.districtData).reduce(function (total, obj) {
+              return total + (obj.zone && obj.zone.zone == 'Green' ? 1 : 0);
+            }, 0)
+          },
+          stats: {
+            doublingRate: doublingRates[key].doublingRate
+          }
+        };
+        stateInsights[key] = insight;
+      });
+      return stateInsights;
     });
-    return stateInsights;
   },
   events: {
     'click #stateSelectionDropdown a.dropdown-item': 'onStateSelectionChange',
@@ -68433,7 +68435,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.$el.find('#dropdownMenuButton').addClass('active');
 
     if (!this.$el.find('#stateDistrictsCriteriaDropDown').is(':visible')) {
-      $mainContainer.find('.sortby-dropdown').append(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_14__["default"]({
+      $mainContainer.find('.sortby-dropdown').append(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_13__["default"]({
         id: 'stateDistrictsCriteriaDropDown',
         label: 'Sort By',
         defaultSortByOption: this.defaultSelections.sortBySelected,
@@ -68526,7 +68528,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     });
     this.$el.find('#statePieChartName').html(this.stateSelected);
-    this.showChildView('stateStatusBadgesRegion', new _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_12__["default"]({
+    this.showChildView('stateStatusBadgesRegion', new _BadgeBar_BadgeBar_view__WEBPACK_IMPORTED_MODULE_11__["default"]({
       district: district
     }));
     this.showChildView('statePieChartRegion', statePieStart);
@@ -68554,7 +68556,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   showCountryLineChart: function showCountryLineChart() {
     var _this5 = this;
 
-    var statesDaily = new _Models_StatesDaily_model__WEBPACK_IMPORTED_MODULE_11__["default"]();
+    var statesDaily = new _Models_StatesDaily_model__WEBPACK_IMPORTED_MODULE_10__["default"]();
     statesDaily.fetch().then(function (result) {
       result = result['states_daily'];
       var timeline = result.filter(function (a) {
@@ -68780,7 +68782,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.$el.find('#topDistrictsBtn').addClass('active');
 
     if (!this.$el.find('#topDistrictsCriteriaDropDown').is(':visible')) {
-      $mainContainer.prepend(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_14__["default"]({
+      $mainContainer.prepend(new _CriteriaDropDown_CriteriaDropDown_view__WEBPACK_IMPORTED_MODULE_13__["default"]({
         id: 'topDistrictsCriteriaDropDown',
         label: 'Criteria',
         defaultSortByOption: this.defaultSelections.sortBySelected,
@@ -68890,6 +68892,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             },
             legend: {
               display: false
+            },
+            onClick: function onClick(state) {
+              _this9.changeStateSelection(state);
             }
           }
         });
@@ -69015,7 +69020,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.className = this.model.get('className');
   },
   events: {
-    'click button#getDistrictsBtn': 'getDistricts'
+    'click button#getDistrictsBtn': 'getDistricts',
+    'click': 'onContainerClick'
+  },
+  onContainerClick: function onContainerClick() {
+    var cb = this.model.get('options').onClick;
+    if (cb) this.model.get('options').onClick(this.model.get('district').loc);
   },
   onRender: function onRender() {
     this.loadPieChart();
@@ -69117,7 +69127,9 @@ __p+='<div class="chart-zone-indicator"></div>\n<div class="pie-chart-title col-
 ((__t=(options.title.text))==null?'':__t)+
 '</div>\n<div class="pie-chart-zone-badges district-badge-items col-xs-4">\n    <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n    <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n    <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n</div>\n<div class="pie-chart-inner-container">\n    <div class="pie-chart-canvas-container col-md-6">\n        <canvas id="'+
 ((__t=(id))==null?'':__t)+
-'_canvas"></canvas>\n    </div>\n    <div class="badge-bar-container chart-legend col-md-6"></div>\n</div>';
+'_canvas"></canvas>\n    </div>\n    <div class="badge-bar-container chart-legend col-md-6"></div>\n    '+
+((__t=((stats && stats.doublingRate) ? stats.doublingRate : ''))==null?'':__t)+
+'\n</div>';
 }
 return __p;
 };

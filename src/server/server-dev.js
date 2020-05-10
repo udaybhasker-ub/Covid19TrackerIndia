@@ -210,6 +210,7 @@ request('/latest/all/doublingrate', {
     resp.end();
 });
 
+/*
 AWS.config.update({
     region: 'ap-south-1'
 });
@@ -268,7 +269,7 @@ cron.schedule("59 23 * * *", function () {
     }).on('error', function (err) {
         console.log('Error:', err);
     });
-});
+});*/
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => {

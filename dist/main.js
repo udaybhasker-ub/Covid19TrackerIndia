@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "3da44ff5e42e37ccc5dc";
+/******/ 	var hotCurrentHash = "eadb352771e5ab26fe2e";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -67970,6 +67970,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(backbone_marionette__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _CriteriaDropDown_view_jst__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CriteriaDropDown.view.jst */ "./src/js/components/CriteriaDropDown/CriteriaDropDown.view.jst");
 /* harmony import */ var _CriteriaDropDown_view_jst__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_CriteriaDropDown_view_jst__WEBPACK_IMPORTED_MODULE_1__);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = (backbone_marionette__WEBPACK_IMPORTED_MODULE_0___default.a.View.extend({
@@ -67984,6 +67996,7 @@ __webpack_require__.r(__webpack_exports__);
     options.defaultSortOrderSelected = false;
     this.sortOrderSelected = options.defaultSortOrderSelected;
     this.defaultLabels = ['Confirmed', 'Confirmed - Daily Increase', 'Active', 'Recovered', 'Recovered - Daily Increase', 'Deaths', 'Deaths - Daily Increase', 'Zone'];
+    if (options.additionalSortOptions) this.defaultLabels = [].concat(_toConsumableArray(this.defaultLabels), _toConsumableArray(options.additionalSortOptions));
     this.model = new Backbone.Model(options);
   },
   events: {
@@ -67994,6 +68007,11 @@ __webpack_require__.r(__webpack_exports__);
     e.preventDefault();
     this.sortBySelected = $(e.target).html();
     this.sortOrderSelected = this.model.get('defaultSortOrderSelected');
+
+    if (this.sortBySelected == "Doubling Rate") {
+      this.sortOrderSelected = true;
+    }
+
     this.updateSortButtons();
     var cb = this.model.get('callback');
     if (cb) cb(this.sortBySelected, this.sortOrderSelected);
@@ -68008,7 +68026,7 @@ __webpack_require__.r(__webpack_exports__);
   onRender: function onRender() {
     var _this = this;
 
-    var labels = this.model.get('labels') || this.defaultLabels;
+    var labels = this.defaultLabels;
     labels.forEach(function (entry) {
       var option = $('<a/>', {
         'class': 'dropdown-item',
@@ -68310,6 +68328,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           label: 'Criteria',
           defaultSortByOption: _this.defaultSelections.sortBySelected,
           sortOrderDisabled: false,
+          additionalSortOptions: ["Doubling Rate"],
           callback: function callback(changedSortBy, changedSortOrder) {
             console.log('selection changed:' + changedSortBy);
 
@@ -68322,7 +68341,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     });
   },
   getStateInsights: function getStateInsights(allDistrictData) {
-    return new _Models_DoublingRate_model__WEBPACK_IMPORTED_MODULE_14__["default"]().fetch().then(function (doublingRates) {
+    var _this2 = this;
+
+    return this.getDoublingRates().then(function (doublingRates) {
       var stateInsights = {};
       Object.keys(allDistrictData).forEach(function (key) {
         var state = allDistrictData[key];
@@ -68362,15 +68383,44 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             Green: Object.values(state.districtData).reduce(function (total, obj) {
               return total + (obj.zone && obj.zone.zone == 'Green' ? 1 : 0);
             }, 0)
-          },
-          stats: {
-            doublingRate: doublingRates[key].doublingRate
           }
+        };
+        var doublingRate = doublingRates[key];
+        if (doublingRate && !doublingRate.errorMessage) insight.stats = {
+          doublingRate: doublingRate.doublingRate
         };
         stateInsights[key] = insight;
       });
+
+      _this2.setCountryDoublingRate(doublingRates['India']);
+
       return stateInsights;
     });
+  },
+  getDoublingRates: function getDoublingRates() {
+    var loaded = {};
+    var drHistory = localStorage.getItem("drHistory");
+    drHistory = drHistory ? JSON.parse(drHistory) : {};
+
+    if (drHistory && drHistory.result && !this.checkExpired(drHistory.lastUpdated, 24 * 60 * 60 * 1000)) {
+      loaded = Promise.resolve(drHistory.result);
+    } else {
+      loaded = new _Models_DoublingRate_model__WEBPACK_IMPORTED_MODULE_14__["default"]().fetch().then(function (doublingRates) {
+        localStorage.setItem("drHistory", JSON.stringify({
+          result: doublingRates,
+          lastUpdated: new Date()
+        }));
+        return doublingRates;
+      });
+    }
+
+    return loaded;
+  },
+  setCountryDoublingRate: function setCountryDoublingRate(doublingRate) {
+    if (doublingRate && !doublingRate.errorMessage) {
+      this.$el.find('#countryPieChartDblRateContainer').find('.badge-dblrate-main').find('.dblrate-text').html("Doubling Rate");
+      this.$el.find('#countryPieChartDblRateContainer').find('.badge-dblrate-main').find('.badge-dblrate').html(doublingRate.doublingRate.toFixed(2) + " days");
+    } else tthis.$el.find('#countryPieChartDblRateContainer').hide();
   },
   events: {
     'click #stateSelectionDropdown a.dropdown-item': 'onStateSelectionChange',
@@ -68384,18 +68434,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.getStateList(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
   },
   getStateList: function getStateList(sortByOption, sortOrderDesc) {
-    var _this2 = this;
+    var _this3 = this;
 
     this.getAllDistrictsData().then(this.getStateInsights.bind(this)).then(function (insights) {
-      return _this2.prepareStateData(insights, sortByOption, sortOrderDesc);
+      return _this3.prepareStateData(insights, sortByOption, sortOrderDesc);
     }).then(function (statewiseData) {
-      _this2.hideAllTabContainers();
+      _this3.hideAllTabContainers();
 
-      _this2.$el.find('#stateListPieChartContainer').show();
+      _this3.$el.find('#stateListPieChartContainer').show();
 
-      _this2.$el.find('#getStatesBtn').addClass('active');
+      _this3.$el.find('#getStatesBtn').addClass('active');
 
-      _this2.getChildView('stateListPieChartRegion').collection.reset(statewiseData);
+      _this3.getChildView('stateListPieChartRegion').collection.reset(statewiseData);
     });
   },
   showTopDistricts: function showTopDistricts(e) {
@@ -68427,7 +68477,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.getChildView('stateLineChartRegion').destroy();
   },
   loadStateCharts: function loadStateCharts() {
-    var _this3 = this;
+    var _this4 = this;
 
     this.hideAllTabContainers();
     var $mainContainer = this.$el.find('#stateChartsMainContainer');
@@ -68443,18 +68493,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         callback: function callback(changedSortBy, changedSortOrder) {
           console.log('selection changed:' + changedSortBy);
 
-          _this3.loadStateDistrictCharts(changedSortBy, changedSortOrder);
+          _this4.loadStateDistrictCharts(changedSortBy, changedSortOrder);
         }
       }).render().el);
     }
 
-    this.loadStateDistrictCharts().then(this.showStatePieStart.bind(this)).then(this.prepareStateLineChartData.bind(this)).then(this.drawStateLineChart.bind(this)).catch(function (err) {
-      localStorage.removeItem(_this3.stateSelected + "_districtHistory");
+    this.getDoublingRates().then(function (doublingRates) {
+      var doublingRate = doublingRates[_this4.stateSelected];
+
+      if (doublingRate && doublingRate.doublingRate) {
+        _this4.$el.find('#statePieChartDblRateContainer .badge-dblrate-main').find('.dblrate-text').html("Doubling Rate");
+
+        _this4.$el.find('#statePieChartDblRateContainer .badge-dblrate-main').find('.badge-dblrate').html(doublingRate.doublingRate.toFixed(2) + " days");
+      } else _this4.$el.find('#statePieChartDblRateContainer .badge-dblrate-container').hide();
+    }).then(this.loadStateDistrictCharts.bind(this)).then(this.showStatePieStart.bind(this)).then(this.prepareStateLineChartData.bind(this)).then(this.drawStateLineChart.bind(this)).catch(function (err) {
+      localStorage.removeItem(_this4.stateSelected + "_districtHistory");
       localStorage.removeItem('allDistrictsLatest');
     });
   },
   loadStateDistrictCharts: function loadStateDistrictCharts(sortBySelected, sortByOrderDescending) {
-    var _this4 = this;
+    var _this5 = this;
 
     var stateName = this.stateSelected;
     sortBySelected = sortBySelected || this.defaultSelections.sortBySelected;
@@ -68468,12 +68526,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }).then(this.prepareDistrictData.bind(this)).then(function (_ref) {
       var districts = _ref.districts,
           stateZoneStats = _ref.stateZoneStats;
-      districts = _this4.sortDistricts(districts, sortBySelected, sortByOrderDescending);
+      districts = _this5.sortDistricts(districts, sortBySelected, sortByOrderDescending);
 
-      _this4.getChildView('districtPieChartRegion').collection.reset(districts);
+      _this5.getChildView('districtPieChartRegion').collection.reset(districts);
 
       Object.keys(stateZoneStats).forEach(function (key) {
-        var $badge = _this4.$el.find('.zone-badge-' + key);
+        var $badge = _this5.$el.find('.zone-badge-' + key);
 
         $badge.html(stateZoneStats[key]);
       });
@@ -68554,7 +68612,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     return result;
   },
   showCountryLineChart: function showCountryLineChart() {
-    var _this5 = this;
+    var _this6 = this;
 
     var statesDaily = new _Models_StatesDaily_model__WEBPACK_IMPORTED_MODULE_10__["default"]();
     statesDaily.fetch().then(function (result) {
@@ -68598,7 +68656,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         yAxesUpperLimit: 10000
       });
 
-      _this5.showChildView('countryLineChartRegion', countryLineChart);
+      _this6.showChildView('countryLineChartRegion', countryLineChart);
     });
   },
   showCountryBarChart: function showCountryBarChart(result) {
@@ -68662,7 +68720,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     return result;
   },
   prepareStateLineChartData: function prepareStateLineChartData() {
-    var _this6 = this;
+    var _this7 = this;
 
     var loaded = {};
     var distHistory = localStorage.getItem(this.stateSelected + "_districtHistory");
@@ -68675,7 +68733,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         type: 'history',
         stateName: this.stateSelected
       }).fetch().then(function (result) {
-        localStorage.setItem(_this6.stateSelected + "_districtHistory", JSON.stringify({
+        localStorage.setItem(_this7.stateSelected + "_districtHistory", JSON.stringify({
           result: result,
           lastUpdated: new Date()
         }));
@@ -68774,7 +68832,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     return loaded;
   },
   getTopDistricts: function getTopDistricts() {
-    var _this7 = this;
+    var _this8 = this;
 
     this.hideAllTabContainers();
     var $mainContainer = this.$el.find('#topDistrictMainContainer');
@@ -68790,7 +68848,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         callback: function callback(changedSortBy, changedSortOrder) {
           console.log('selection changed:' + changedSortBy);
 
-          _this7.renderTopDistricts(changedSortBy, changedSortOrder);
+          _this8.renderTopDistricts(changedSortBy, changedSortOrder);
         }
       }).render().el);
       this.showChildView('topDistrictPieChartRegion', new _PieChartCollection_PieChartCollection_view__WEBPACK_IMPORTED_MODULE_7__["default"]({
@@ -68801,7 +68859,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     return this.renderTopDistricts(this.defaultSelections.sortBySelected, this.defaultSelections.sortByOrderDescending);
   },
   renderTopDistricts: function renderTopDistricts(criteria, orderDesc) {
-    var _this8 = this;
+    var _this9 = this;
 
     return this.getAllDistrictsData().then(function (allDistrictData) {
       var allDistricts = [],
@@ -68814,7 +68872,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           allDistricts.push(d);
         });
       });
-      allDistricts = _this8.sortDistricts(allDistricts, criteria, orderDesc);
+      allDistricts = _this9.sortDistricts(allDistricts, criteria, orderDesc);
       allDistricts = allDistricts.splice(0, 10);
       allDistricts.forEach(function (dist) {
         result[dist.name] = dist;
@@ -68827,7 +68885,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var districts = _ref2.districts,
           stateZoneStats = _ref2.stateZoneStats;
 
-      _this8.getChildView('topDistrictPieChartRegion').collection.reset(districts); //this.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
+      _this9.getChildView('topDistrictPieChartRegion').collection.reset(districts); //this.$el.find('#topDistrictSortByDropdown > button').html('Criteria: ' + criteria);
 
 
       return districts;
@@ -68870,7 +68928,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     });
   },
   prepareStateData: function prepareStateData(result, sortBySelected, sortByOrderDescending) {
-    var _this9 = this;
+    var _this10 = this;
 
     return new Promise(function (resolve, rej) {
       //console.log(result);
@@ -68894,12 +68952,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               display: false
             },
             onClick: function onClick(state) {
-              _this9.changeStateSelection(state);
+              _this10.changeStateSelection(state);
             }
           }
         });
       });
-      stateList = _this9.sortDistricts(stateList, sortBySelected, sortByOrderDescending);
+      stateList = _this10.sortDistricts(stateList, sortBySelected, sortByOrderDescending);
       resolve(stateList);
     });
   },
@@ -68944,6 +69002,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
 
         if (!flag) flag = b.deceased - a.deceased;
+      } else if (sortBy == 'Doubling Rate') {
+        if (b.stats && a.stats) {
+          flag = b.stats.doublingRate - a.stats.doublingRate;
+        }
+
+        if (!flag) flag = -1;
       } else {
         flag = b.confirmed - a.confirmed;
       }
@@ -68969,7 +69033,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="container">\n  <div class="row">\n    <div id="titleBar" class="col">\n      <div id="pageTitle">India COVID-19 Tracker</div>\n    </div>\n  </div>\n  <div class="border-top"></div>\n  <div class="container country-chart-container">\n    <div class="row">\n      <div class="col-md-4 align-self-center">\n        <div id="countryPieChartContainer"></div>\n      </div>\n      <div class="col-md-8 align-self-center">\n        <div id="countryLineChartContainer"></div>\n      </div>\n    </div>\n  </div>\n\n  <div id="selectionNavBar" class="row">\n    <div class="col">\n      <ul class="nav nav-tabs">\n        <li class="nav-item">\n          <a id="getStatesBtn" class="nav-link" href="#">States</a>\n        </li>\n        <li class="nav-item">\n          <a id="topDistrictsBtn" class="nav-link" href="#">Top 10 Districts</a>\n        </li>\n        <li id="stateSelectionDropdown" class="nav-item dropdown">\n          <a id="dropdownMenuButton" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"\n            aria-haspopup="true" aria-expanded="false">Select State</a>\n          <div class="dropdown-menu"></div>\n        </li>\n        <li class="nav-item">\n          <!--<a class="nav-link" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"\n            aria-controls="collapseExample">Zone Restrictions</a>-->\n        </li>\n      </ul>\n    </div>\n  </div>\n  <div id="zoneRestrictionsContainer" class="tab-item-container"></div>\n  <div id="topDistrictMainContainer" class="tab-item-container">\n    <div id="topDistrictChartsContainer" class="row"></div>\n  </div>\n  <div id="stateListPieChartContainer" class="tab-item-container"></div>\n  <div id="stateChartsMainContainer" class="tab-item-container">\n    <div id="stateContentMain" class="">\n      <div id="stateStatusBanner" class="row">\n        <div id="statePieChartContainer" class="col-md-2"></div>\n        <div id="stateLineChartContainer" class="col-md-2 d-none d-lg-block"></div>\n        <div id="statePieChartName" class="col-md-2"></div>\n        <div id="stateStatusBadgesContainer" class="col-md-6"></div>\n      </div>\n      <div class="row district-wide-graphs-row">\n        <div id="districtContainer">\n          <div id="districtsHeader" class="row">\n            <div class="col-sm-2">\n              <div class="distric-header-text">Districts</div>\n            </div>\n            <div class="col-sm-4 district-badge-items">\n              <div class="zones-header-text">Zones</div>\n              <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n              <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n              <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n            </div>\n            <div class="col-sm-6 sortby-dropdown">\n              \n            </div>\n          </div>\n          <div class="border-bottom"></div>\n          <div id="districtChartsContainer"></div>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class="border-top my-3"></div>\n  <div class="row">\n    <div id="footerBar" class="col">\n      <div id="footerCreditsText">Data Source: www.covid19india.org</div>\n      <div id="footerDevText">Developed by Uday Bhasker. Work in progress.</div>\n    </div>\n  </div>\n</div>';
+__p+='<div class="container">\n  <div class="row">\n    <div id="titleBar" class="col">\n      <div id="pageTitle">India COVID-19 Tracker</div>\n    </div>\n  </div>\n  <div class="border-top"></div>\n  <div class="container country-chart-container">\n    <div class="row">\n      <div class="col-md-4 align-self-center">\n        <div id="countryPieChartContainer"></div>\n        <div id="countryPieChartDblRateContainer" class="badge-dblrate-container">\n          <div class="badge badge-light badge-dblrate-main">\n            <span class="badge dblrate-text"></span>\n            <div class="badge badge-secondary badge-dblrate"></div>\n          </div>\n        </div>\n      </div>\n      <div class="col-md-8 align-self-center">\n        <div id="countryLineChartContainer"></div>\n      </div>\n    </div>\n  </div>\n\n  <div id="selectionNavBar" class="row">\n    <div class="col">\n      <ul class="nav nav-tabs">\n        <li class="nav-item">\n          <a id="getStatesBtn" class="nav-link" href="#">States</a>\n        </li>\n        <li class="nav-item">\n          <a id="topDistrictsBtn" class="nav-link" href="#">Top 10 Districts</a>\n        </li>\n        <li id="stateSelectionDropdown" class="nav-item dropdown">\n          <a id="dropdownMenuButton" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"\n            aria-haspopup="true" aria-expanded="false">Select State</a>\n          <div class="dropdown-menu"></div>\n        </li>\n        <li class="nav-item">\n          <!--<a class="nav-link" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"\n            aria-controls="collapseExample">Zone Restrictions</a>-->\n        </li>\n      </ul>\n    </div>\n  </div>\n  <div id="zoneRestrictionsContainer" class="tab-item-container"></div>\n  <div id="topDistrictMainContainer" class="tab-item-container">\n    <div id="topDistrictChartsContainer" class="row"></div>\n  </div>\n  <div id="stateListPieChartContainer" class="tab-item-container"></div>\n  <div id="stateChartsMainContainer" class="tab-item-container">\n    <div id="stateContentMain" class="">\n      <div id="stateStatusBanner" class="row">\n        <div id="statePieChartContainer" class="col-md-2"></div>\n        <div id="stateLineChartContainer" class="col-md-2 d-none d-lg-block"></div>\n        <div class="col-md-2">\n          <div id="statePieChartName"></div>\n          <div id="statePieChartDblRateContainer" class="badge-dblrate-container">\n            <div class="badge badge-light badge-dblrate-main">\n              <span class="badge dblrate-text"></span>\n              <div class="badge badge-secondary badge-dblrate"></div>\n            </div>\n          </div>\n        </div>\n        <div id="stateStatusBadgesContainer" class="col-md-6"></div>\n      </div>\n      <div class="row district-wide-graphs-row">\n        <div id="districtContainer">\n          <div id="districtsHeader" class="row">\n            <div class="col-sm-2">\n              <div class="distric-header-text">Districts</div>\n            </div>\n            <div class="col-sm-4 district-badge-items">\n              <div class="zones-header-text">Zones</div>\n              <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n              <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n              <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n            </div>\n            <div class="col-sm-6 sortby-dropdown">\n\n            </div>\n          </div>\n          <div class="border-bottom"></div>\n          <div id="districtChartsContainer"></div>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class="border-top my-3"></div>\n  <div class="row">\n    <div id="footerBar" class="col">\n      <div id="footerCreditsText">Data Source: www.covid19india.org</div>\n      <div id="footerDevText">Developed by Uday Bhasker. Work in progress.</div>\n    </div>\n  </div>\n</div>';
 }
 return __p;
 };
@@ -69055,6 +69119,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         $container.find('.zone-badge-' + key).html(district.zones[key]);
       });
     } else this.$el.find('.pie-chart-zone-badges').hide();
+
+    if (district.stats && district.stats.doublingRate) {
+      this.$el.find('.badge-dblrate-main').find('.dblrate-text').html("Doubling Rate");
+      this.$el.find('.badge-dblrate-main').find('.badge-dblrate').html(district.stats.doublingRate.toFixed(2) + " days");
+    } else this.$el.find('.badge-dblrate-container').hide();
   },
   getDateDiffInDays: function getDateDiffInDays(a, b) {
     var _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -69127,9 +69196,7 @@ __p+='<div class="chart-zone-indicator"></div>\n<div class="pie-chart-title col-
 ((__t=(options.title.text))==null?'':__t)+
 '</div>\n<div class="pie-chart-zone-badges district-badge-items col-xs-4">\n    <div class="badge badge-secondary zone-badge-Red" style="background-color:red"></div>\n    <div class="badge badge-secondary zone-badge-Orange" style="background-color: orange"></div>\n    <div class="badge badge-secondary zone-badge-Green" style="background-color: green"></div>\n</div>\n<div class="pie-chart-inner-container">\n    <div class="pie-chart-canvas-container col-md-6">\n        <canvas id="'+
 ((__t=(id))==null?'':__t)+
-'_canvas"></canvas>\n    </div>\n    <div class="badge-bar-container chart-legend col-md-6"></div>\n    '+
-((__t=((stats && stats.doublingRate) ? stats.doublingRate : ''))==null?'':__t)+
-'\n</div>';
+'_canvas"></canvas>\n    </div>\n    <div class="badge-bar-container chart-legend col-md-6"></div>\n    <div class="badge-dblrate-container">\n        <div class="badge badge-light badge-dblrate-main">\n            <span class="badge dblrate-text"></span>\n            <div class="badge badge-secondary badge-dblrate"></div>\n        </div>\n    </div>\n</div>';
 }
 return __p;
 };

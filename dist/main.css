@@ -281,10 +281,29 @@ a#dropdownMenuButton {
   margin-top: auto;
   margin-bottom: auto;
 }
-#stateStatusBanner > #statePieChartName {
+#stateStatusBanner #statePieChartName {
   font-size: 27px;
   font-weight: bold;
   text-align: center;
+}
+.badge-dblrate-container {
+  width: 100%;
+  display: inline-block;
+  text-align: center;
+  margin-top: 8px;
+}
+.badge-dblrate-container .badge-dblrate-main {
+  background-color: #dedede;
+}
+.badge-dblrate-container .badge-dblrate-main .dblrate-text {
+  font-size: 8pt;
+}
+.badge-dblrate-container .badge-dblrate-main .badge-dblrate {
+  width: 72px;
+  font-size: 8pt;
+}
+#statePieChartDblRateContainer {
+  margin-bottom: 8px;
 }
 #districtsHeader {
   margin: 7px 20px;
